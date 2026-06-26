@@ -1,11 +1,19 @@
 require('dotenv').config();
+require('./models/associations');
+
+const cors = require('cors');
 const express = require("express");
 const sequelize = require("./config/db");
-require('./models/associations');
+const Auth_Routes = require("./routes/Auth_Routes");
 
 const app = express();
 
+app.use(cors());
+app.use(express.json());
+app.use('/uploads', express.static('uploads'));
+app.use(express.static("public"));
 
+app.use("/api/auth", Auth_Routes);
 
 
 
@@ -23,7 +31,7 @@ async function testConnection() {
 async function syncDatabase() {
   try {
    
-    await sequelize.sync({ alter: true }); 
+    await sequelize.sync(); 
     console.log("Database synchronized successfully!");
     console.log(`>---------------------------------------------------------`);
     console.log(``);
