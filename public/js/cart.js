@@ -2,6 +2,10 @@
     var API = 'http://localhost:3000';
     var token = localStorage.getItem('token');
 
+    PrettyPettyUI.apiBase = API;
+    PrettyPettyUI.initButtons('button');
+    PrettyPettyUI.initProductSearchAutocomplete();
+
     // ── User bar ──
     function initUserBar() {
         var user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -124,23 +128,23 @@
     });
 
     $(document).on('click', '.remove-item-btn', function() {
-        if (!confirm('Take this item out of your cart?')) return;
-
         var row = $(this).closest('tr');
         var itemId = row.data('cart-item-id');
 
-        $.ajax({
-            url: API + '/api/cart/' + itemId,
-            method: 'PUT',
-            headers: { 'Authorization': 'Bearer ' + token },
-            data: JSON.stringify({ quantity: 0 }),
-            contentType: 'application/json',
-            success: function() {
-                loadCart();
-            },
-            error: function(err) {
-                $('#cart-error').text(err.responseJSON ? err.responseJSON.message : 'Could not update item');
-            }
+        PrettyPettyUI.confirm('Take this item out of your cart?', function() {
+            $.ajax({
+                url: API + '/api/cart/' + itemId,
+                method: 'PUT',
+                headers: { 'Authorization': 'Bearer ' + token },
+                data: JSON.stringify({ quantity: 0 }),
+                contentType: 'application/json',
+                success: function() {
+                    loadCart();
+                },
+                error: function(err) {
+                    $('#cart-error').text(err.responseJSON ? err.responseJSON.message : 'Could not update item');
+                }
+            });
         });
     });
 

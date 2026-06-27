@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pretty Petty - Admin Orders</title>
-      
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
 </head>
 <body>
 
@@ -43,7 +44,13 @@
         <div id="list-error" style="color: red;"></div>
         <div id="list-success" style="color: green;"></div>
 
-        <!-- VIEW 1: ORDERS LIST TABLE -->
+        <!-- jQuery UI Tabs: orders list + order details -->
+        <div id="order-tabs">
+            <ul>
+                <li><a href="#orders-list-view">All Orders</a></li>
+                <li><a href="#order-details-view">Order Details</a></li>
+            </ul>
+
         <div id="orders-list-view">
             <table id="orders-table" style="width: 100%; border-collapse: collapse;">
                 <thead>
@@ -73,11 +80,8 @@
             </table>
         </div>
 
-        <hr>
-
-        <!-- VIEW 2: ORDER DETAILS & UPDATE STATUS (Hidden by default, shown via jQuery) -->
-        <!-- This is the core of the Term Test requirement -->
-        <div id="order-details-view" style="display: none;">
+        <!-- Order details & update status (Term Test) -->
+        <div id="order-details-view">
             
             <h3>Order Details for Order #<span id="detail-order-id">-</span></h3>
             <p><strong>Customer ID:</strong> <span id="detail-user-id">-</span></p>
@@ -150,6 +154,8 @@
 
         </div>
 
+        </div><!-- /#order-tabs -->
+
         </div>
 
     </main>
@@ -161,6 +167,8 @@
     </footer>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
+<script src="/js/ui-common.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="/js/admin-orders.js"></script>

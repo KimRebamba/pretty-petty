@@ -20,6 +20,8 @@ $(document).ready(function() {
 
     const API = 'http://localhost:3000';
 
+    PrettyPettyUI.initButtons('#logout-btn');
+
     // Logout handler
     $('#logout-btn').on('click', function(e) {
         e.preventDefault();
@@ -101,16 +103,17 @@ $(document).ready(function() {
 
     // Delete review
     $(document).on('click', '.delete-btn', function() {
-        if (!confirm('Are you sure you want to delete this review?')) return;
         const id = $(this).data('id');
-        $.ajax({
-            url: API + '/api/reviews/' + id,
-            method: 'DELETE',
-            headers: { Authorization: 'Bearer ' + token },
-            success: function() {
-                loadReviews();
-            },
-            error: function() { $('#action-error').text('Failed to delete review.'); }
+        PrettyPettyUI.confirm('Are you sure you want to delete this review?', function() {
+            $.ajax({
+                url: API + '/api/reviews/' + id,
+                method: 'DELETE',
+                headers: { Authorization: 'Bearer ' + token },
+                success: function() {
+                    loadReviews();
+                },
+                error: function() { $('#action-error').text('Failed to delete review.'); }
+            });
         });
     });
 

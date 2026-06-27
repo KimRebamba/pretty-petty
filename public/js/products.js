@@ -3,6 +3,10 @@ $(document).ready(function () {
     const token = localStorage.getItem('token');
     const isLoggedIn = !!token;
 
+    PrettyPettyUI.apiBase = API;
+    PrettyPettyUI.initButtons('button');
+    PrettyPettyUI.initProductSearchAutocomplete();
+
     // ── User bar ──
     function initUserBar() {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -107,6 +111,7 @@ $(document).ready(function () {
         categories.forEach(function (cat) {
             $select.after($('<option></option>').val(cat.id).text(cat.name));
         });
+        PrettyPettyUI.initSelectmenu('#category-filter');
     });
 
     // ── Fetch products ──
@@ -156,6 +161,7 @@ $(document).ready(function () {
             $controls.append(btn);
         }
         $controls.append($('<button class="page-btn"></button>').text('Next').data('page', currentPage + 1).prop('disabled', currentPage === totalPages));
+        PrettyPettyUI.initButtons('.page-btn');
     }
 
     $(document).on('click', '.page-btn', function () {
@@ -204,6 +210,7 @@ $(document).ready(function () {
             margin: '10px 0', padding: '6px 14px', cursor: 'pointer'
         });
         $('#category-filter').parent().after($btn);
+        PrettyPettyUI.initButtons('#toggle-scroll-mode');
     }
 
     $(document).on('click', '#toggle-scroll-mode', function () {

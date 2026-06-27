@@ -1,6 +1,8 @@
 $(document).ready(function () {
     const API = 'http://localhost:3000';
 
+    PrettyPettyUI.initButtons('button, input[type="submit"]');
+
     // If already logged in, redirect
     const token = localStorage.getItem('token');
     if (token) {
@@ -34,16 +36,19 @@ $(document).ready(function () {
 
         if (!firstName || !lastName || !email || !password) {
             $('#general-error').text('Please fill in all required fields.').show();
+            PrettyPettyUI.shake('#register-form');
             return;
         }
 
         if (password !== confirmPassword) {
             $('#password_confirmation-error').text('Passwords do not match.');
+            PrettyPettyUI.shake('#register-form');
             return;
         }
 
         if (password.length < 6) {
             $('#password-error').text('Password must be at least 6 characters.');
+            PrettyPettyUI.shake('#register-form');
             return;
         }
 

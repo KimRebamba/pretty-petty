@@ -3,6 +3,10 @@ $(document).ready(function () {
     const token = localStorage.getItem('token');
     const isLoggedIn = !!token;
 
+    PrettyPettyUI.apiBase = API;
+    PrettyPettyUI.initButtons('button');
+    PrettyPettyUI.initProductSearchAutocomplete();
+
     // ── User bar ──
     function initUserBar() {
         const user = JSON.parse(localStorage.getItem('user') || '{}');

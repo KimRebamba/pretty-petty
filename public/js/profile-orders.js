@@ -9,6 +9,8 @@ $(document).ready(function () {
         return;
     }
 
+    PrettyPettyUI.initButtons('button');
+
     if (user.first_name || user.last_name) {
         $('#user-display-name').text('Hi, ' + (user.first_name || '') + ' ' + (user.last_name || ''));
     }
@@ -152,23 +154,24 @@ $(document).ready(function () {
 
     $(document).on('click', '.cancel-order-btn', function () {
         var orderId = $(this).data('order-id');
-        if (!confirm('Are you sure you want to cancel this order?')) return;
-
         var $btn = $(this);
-        $btn.prop('disabled', true).text('Cancelling...');
 
-        $.ajax({
-            url: API + '/api/orders/' + orderId + '/cancel',
-            method: 'PUT',
-            headers: { Authorization: 'Bearer ' + token },
-            success: function () {
-                reloadOrders();
-            },
-            error: function (xhr) {
-                var msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to cancel order.';
-                alert(msg);
-                $btn.prop('disabled', false).text('Cancel Order');
-            }
+        PrettyPettyUI.confirm('Are you sure you want to cancel this order?', function () {
+            $btn.prop('disabled', true).text('Cancelling...');
+
+            $.ajax({
+                url: API + '/api/orders/' + orderId + '/cancel',
+                method: 'PUT',
+                headers: { Authorization: 'Bearer ' + token },
+                success: function () {
+                    reloadOrders();
+                },
+                error: function (xhr) {
+                    var msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to cancel order.';
+                    alert(msg);
+                    $btn.prop('disabled', false).text('Cancel Order');
+                }
+            });
         });
     });
 

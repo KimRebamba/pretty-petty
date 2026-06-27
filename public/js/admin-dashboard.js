@@ -18,6 +18,8 @@ $(document).ready(function () {
     }
 
     const API = 'http://localhost:3000';
+
+    PrettyPettyUI.initButtons('#logout-btn');
     let salesChart = null;
     let ordersChart = null;
     let categoriesChart = null;

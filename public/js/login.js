@@ -1,6 +1,8 @@
 $(document).ready(function () {
     const API = 'http://localhost:3000';
 
+    PrettyPettyUI.initButtons('button, input[type="submit"]');
+
     // Check URL params for messages (e.g., ?msg=access_denied)
     const urlParams = new URLSearchParams(window.location.search);
     const msg = urlParams.get('msg');
@@ -51,7 +53,10 @@ $(document).ready(function () {
             hasError = true;
         }
 
-        if (hasError) return;
+        if (hasError) {
+            PrettyPettyUI.shake('#login-form');
+            return;
+        }
 
         $.ajax({
             url: API + '/api/auth/login',
@@ -71,6 +76,7 @@ $(document).ready(function () {
             error: function (xhr) {
                 const msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Login failed. Please try again.';
                 $error.text(msg).show();
+                PrettyPettyUI.shake('#login-form');
             }
         });
     });

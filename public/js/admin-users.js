@@ -20,6 +20,9 @@ $(document).ready(function() {
 
     const API = 'http://localhost:3000';
 
+    PrettyPettyUI.initButtons('button, input[type="submit"], #cancel-edit-btn');
+    PrettyPettyUI.initSelectmenu('#edit-role, #edit-status');
+
     // Logout handler
     $('#logout-btn').on('click', function(e) {
         e.preventDefault();
@@ -90,7 +93,9 @@ $(document).ready(function() {
         $('#edit-user-email-display').text(email);
         $('#edit-role').val(role);
         $('#edit-status').val(status);
-        $('#edit-user-section').show();
+        PrettyPettyUI.refreshSelectmenu('#edit-role');
+        PrettyPettyUI.refreshSelectmenu('#edit-status');
+        $('#edit-user-section').show('blind', 300);
         $('#action-success').text('');
         $('#action-error').text('');
         $('html, body').animate({ scrollTop: 0 }, 300);
@@ -121,7 +126,7 @@ $(document).ready(function() {
 
     // Cancel edit
     $('#cancel-edit-btn').on('click', function() {
-        $('#edit-user-section').hide();
+        $('#edit-user-section').hide('blind', 300);
         $('#action-success').text('');
         $('#action-error').text('');
     });

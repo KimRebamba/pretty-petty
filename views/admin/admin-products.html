@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pretty Petty - Admin Products</title>
-      
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
 </head>
 <body>
 
@@ -45,14 +46,14 @@
 
         <!-- PRODUCT FORM (Create & Edit) -->
         <!-- enctype is REQUIRED for MP3 Multiple File Uploads to work with Node.js Multer -->
-        <form id="product-form" enctype="multipart/form-data" style="margin-bottom: 30px;">
+        <form id="product-form" enctype="multipart/form-data" novalidate style="margin-bottom: 30px;">
             
             <!-- Hidden ID field for editing existing products -->
             <input type="hidden" id="prod-id" name="id" value="">
 
             <div>
                 <label for="prod-name">Product Name:</label><br>
-                <input type="text" id="prod-name" name="name" required>
+                <input type="text" id="prod-name" name="name">
                 <span class="error-text" id="prod-name-error" style="color: red;"></span>
             </div>
             <br>
@@ -60,7 +61,7 @@
             <div>
                 <label for="prod-category">Category:</label><br>
                 <!-- jQuery will fetch /api/categories to populate this dropdown -->
-                <select id="prod-category" name="category_id" required>
+                <select id="prod-category" name="category_id">
                     <option value="">-- Select Category --</option>
                     <!-- Example: <option value="1">Dog Food</option> -->
                 </select>
@@ -77,21 +78,21 @@
 
             <div>
                 <label for="prod-price">Price ($):</label><br>
-                <input type="number" id="prod-price" name="price" step="0.01" min="0" required>
+                <input type="number" id="prod-price" name="price" step="0.01" min="0">
                 <span class="error-text" id="prod-price-error" style="color: red;"></span>
             </div>
             <br>
 
             <div>
                 <label for="prod-stock">Stock Quantity:</label><br>
-                <input type="number" id="prod-stock" name="stock" min="0" required>
+                <input type="number" id="prod-stock" name="stock" min="0">
                 <span class="error-text" id="prod-stock-error" style="color: red;"></span>
             </div>
             <br>
 
             <div>
                 <label for="prod-status">Status:</label><br>
-                <select id="prod-status" name="status" required>
+                <select id="prod-status" name="status">
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                 </select>
@@ -163,6 +164,9 @@
     </footer>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
+<script src="/js/ui-common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.20.0/dist/jquery.validate.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="/js/admin-products.js"></script>

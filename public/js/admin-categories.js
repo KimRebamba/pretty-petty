@@ -20,6 +20,9 @@ $(document).ready(function() {
 
     const API = 'http://localhost:3000';
 
+    PrettyPettyUI.initButtons('button, input[type="submit"], #cancel-edit-btn');
+    PrettyPettyUI.initSelectmenu('#cat-status');
+
     // Logout handler
     $('#logout-btn').on('click', function(e) {
         e.preventDefault();
@@ -75,14 +78,26 @@ $(document).ready(function() {
         });
     }
 
-    // Create / Update category
-    $('#category-form').on('submit', function(e) {
-        e.preventDefault();
+    $.validator.addMethod('requireImageOnCreate', function(value, element) {
+        if ($('#cat-id').val()) {
+            return true;
+        }
+        return element.files && element.files.length > 0;
+    }, 'Please select a category image.');
+
+    $.validator.addMethod('imageFile', function(value, element) {
+        if (!element.files || !element.files.length) {
+            return true;
+        }
+        return /\.(jpe?g|png|gif|webp)$/i.test(element.files[0].name);
+    }, 'Please upload a valid image file (jpg, jpeg, png, gif, webp).');
+
+    function submitCategoryForm(form) {
         $('#form-error').text('');
         $('#form-success').text('');
 
         const catId = $('#cat-id').val();
-        const formData = new FormData(this);
+        const formData = new FormData(form);
         if (!catId) { formData.delete('id'); }
 
         const isEdit = !!catId;
@@ -105,7 +120,48 @@ $(document).ready(function() {
                 $('#form-error').text(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Operation failed.');
             }
         });
+    }
+
+    $('#category-form').validate({
+        rules: {
+            name: {
+                required: true,
+                minlength: 2,
+                maxlength: 100
+            },
+            description: {
+                maxlength: 500
+            },
+            status: {
+                required: true
+            },
+            image: {
+                requireImageOnCreate: true,
+                imageFile: true
+            }
+        },
+        messages: {
+            name: {
+                required: 'Category name is required.',
+                minlength: 'Category name must be at least 2 characters.',
+                maxlength: 'Category name cannot exceed 100 characters.'
+            },
+            description: {
+                maxlength: 'Description cannot exceed 500 characters.'
+            },
+            status: {
+                required: 'Please select a status.'
+            }
+        },
+        errorPlacement: function(error, element) {
+            error.appendTo('#' + element.attr('id') + '-error');
+        },
+        submitHandler: function(form) {
+            submitCategoryForm(form);
+        }
     });
+
+    // Create / Update category — handled by jQuery Validate submitHandler
 
     // Edit category
     $(document).on('click', '.edit-btn', function() {
@@ -119,6 +175,7 @@ $(document).ready(function() {
                 $('#cat-name').val(c.name);
                 $('#cat-description').val(c.description);
                 $('#cat-status').val(c.status);
+                PrettyPettyUI.refreshSelectmenu('#cat-status');
                 $('#submit-btn').text('Update Category');
                 $('#cancel-edit-btn').show();
 
@@ -138,16 +195,17 @@ $(document).ready(function() {
 
     // Delete category
     $(document).on('click', '.delete-btn', function() {
-        if (!confirm('Are you sure you want to delete this category?')) return;
         const id = $(this).data('id');
-        $.ajax({
-            url: API + '/api/categories/' + id,
-            method: 'DELETE',
-            headers: { Authorization: 'Bearer ' + token },
-            success: function() {
-                loadCategories();
-            },
-            error: function() { $('#form-error').text('Failed to delete category.'); }
+        PrettyPettyUI.confirm('Are you sure you want to delete this category?', function() {
+            $.ajax({
+                url: API + '/api/categories/' + id,
+                method: 'DELETE',
+                headers: { Authorization: 'Bearer ' + token },
+                success: function() {
+                    loadCategories();
+                },
+                error: function() { $('#form-error').text('Failed to delete category.'); }
+            });
         });
     });
 
@@ -157,6 +215,8 @@ $(document).ready(function() {
     });
 
     function resetCategoryForm() {
+        const validator = $('#category-form').validate();
+        validator.resetForm();
         $('#category-form')[0].reset();
         $('#cat-id').val('');
         $('#submit-btn').text('Add Category');
@@ -164,6 +224,7 @@ $(document).ready(function() {
         $('#current-image-container').hide();
         $('#form-success').text('');
         $('#form-error').text('');
+        $('.error-text').empty();
     }
 
     loadCategories();

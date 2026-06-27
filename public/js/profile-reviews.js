@@ -9,6 +9,8 @@ $(document).ready(function () {
         return;
     }
 
+    PrettyPettyUI.initButtons('button');
+
     if (user.first_name || user.last_name) {
         $('#user-display-name').text('Hi, ' + (user.first_name || '') + ' ' + (user.last_name || ''));
     }
@@ -93,23 +95,26 @@ $(document).ready(function () {
 
     $(document).on('click', '.delete-review-btn', function () {
         var reviewId = $(this).data('review-id');
-        if (!confirm('Delete this review? This cannot be undone.')) return;
-
         var $card = $(this).closest('.review-card');
-        $.ajax({
-            url: API + '/api/reviews/' + reviewId,
-            method: 'DELETE',
-            headers: { Authorization: 'Bearer ' + token },
-            success: function () {
-                $card.remove();
-                if ($('#reviews-list .review-card').length === 0) {
-                    $('#reviews-empty').show();
+
+        PrettyPettyUI.confirm('Delete this review? This cannot be undone.', function () {
+            $.ajax({
+                url: API + '/api/reviews/' + reviewId,
+                method: 'DELETE',
+                headers: { Authorization: 'Bearer ' + token },
+                success: function () {
+                    $card.fadeOut(300, function () {
+                        $(this).remove();
+                        if ($('#reviews-list .review-card').length === 0) {
+                            $('#reviews-empty').show();
+                        }
+                    });
+                },
+                error: function (xhr) {
+                    var msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to delete review.';
+                    alert(msg);
                 }
-            },
-            error: function (xhr) {
-                var msg = (xhr.responseJSON && xhr.responseJSON.message) || 'Failed to delete review.';
-                alert(msg);
-            }
+            });
         });
     });
 

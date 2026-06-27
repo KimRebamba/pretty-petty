@@ -4,24 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pretty Petty - Pet Supplies</title>
+    <link rel="stylesheet" href="/css/customer.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
 </head>
 <body>
 
     <header>
         <h1>Pretty Petty</h1>
         <nav>
-            <a href="index.html">Home</a> | 
-            <a href="products.html">Products</a> | 
-            <a href="cart.html">Cart (<span class="cart-count">0</span>)</a> | 
-            <a href="profile-orders.html">My Orders</a> | 
-            <a href="profile-reviews.html">My Reviews</a> | 
-            <a href="profile.html">Profile</a> | 
+            <a href="index.html">Home</a> 
+            <a href="products.html">Products</a> 
+            <a href="cart.html">Cart (<span class="cart-count">0</span>)</a> 
+            <a href="profile-orders.html">My Orders</a> 
+            <a href="profile-reviews.html">My Reviews</a> 
+            <a href="profile.html">Profile</a> 
             <span id="nav-auth">
-                <a href="login.html">Login</a> | 
+                <a href="login.html">Login</a> 
                 <a href="register.html">Register</a>
-            </span>
-            <span id="nav-user" style="display: none;">
-                <a href="#" id="logout-link">Logout</a>
             </span>
         </nav>
         <div id="user-bar" style="display: none; align-items: center; gap: 10px; margin-top: 5px; font-size: 14px;">
@@ -43,13 +43,13 @@
 
     <main>
         
-        <!-- HERO SECTION -->
+        <!-- HERO SECTION
         <section>
             <h2>Welcome to Pretty Petty!</h2>
             <p>Your one-stop shop for all your pet's needs.</p>
         </section>
 
-        <hr>
+        <hr> -->
 
         <!-- CATEGORIES SECTION (Fetched from 'categories' table) -->
         <section>
@@ -94,16 +94,14 @@
 
     </main>
 
-    <hr>
 
     <footer>
         <p>&copy; 2023 Pretty Petty. All rights reserved.</p>
     </footer>
 
-</body>
-</html>
-
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
+    <script src="/js/ui-common.js"></script>
     <script src="/js/index.js"></script>
 </body>
 </html>

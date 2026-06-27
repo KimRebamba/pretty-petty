@@ -20,6 +20,11 @@ $(document).ready(function() {
 
     const API = 'http://localhost:3000';
 
+    PrettyPettyUI.initButtons('#logout-btn, #back-to-list-btn, #update-status-btn');
+    PrettyPettyUI.initSelectmenu('#update-status');
+
+    $('#order-tabs').tabs({ disabled: [1] });
+
     // Logout handler
     $('#logout-btn').on('click', function(e) {
         e.preventDefault();
@@ -106,9 +111,9 @@ $(document).ready(function() {
                 });
                 $('#detail-grand-total').text('$' + grandTotal.toFixed(2));
 
-                // Show details view
-                $('#orders-list-view').hide();
-                $('#order-details-view').show();
+                $('#order-tabs').tabs('enable', 1);
+                $('#order-tabs').tabs('option', 'active', 1);
+                PrettyPettyUI.refreshSelectmenu('#update-status');
                 $('#update-success').text('');
                 $('#update-error').text('');
             },
@@ -128,8 +133,7 @@ $(document).ready(function() {
             headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
             data: JSON.stringify({ status: status }),
             success: function() {
-                $('#update-success').text('Order status updated! Email notification sent.');
-                // Reload order details to reflect new status
+                PrettyPettyUI.flashMessage('#update-success', 'Order status updated! Email notification sent.');
                 $('.view-order-btn[data-order-id="' + orderId + '"]').trigger('click');
                 loadOrders();
             },
@@ -141,8 +145,8 @@ $(document).ready(function() {
 
     // Back to list
     $('#back-to-list-btn').on('click', function() {
-        $('#order-details-view').hide();
-        $('#orders-list-view').show();
+        $('#order-tabs').tabs('option', 'active', 0);
+        $('#order-tabs').tabs('disable', 1);
     });
 
     loadOrders();

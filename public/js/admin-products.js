@@ -21,6 +21,9 @@ $(document).ready(function() {
 
     const API = 'http://localhost:3000';
 
+    PrettyPettyUI.initButtons('button, input[type="submit"], #cancel-edit-btn');
+    PrettyPettyUI.initSelectmenu('#prod-category, #prod-status');
+
     // Logout handler
     $('#logout-btn').on('click', function(e) {
         e.preventDefault();
@@ -85,20 +88,34 @@ $(document).ready(function() {
                     html += '<option value="' + c.id + '">' + c.name + '</option>';
                 });
                 $('#prod-category').html(html);
+                PrettyPettyUI.refreshSelectmenu('#prod-category');
             }
         });
     }
 
-    // Create / Update product
-    $('#product-form').on('submit', function(e) {
-        e.preventDefault();
+    $.validator.addMethod('requireImagesOnCreate', function(value, element) {
+        if ($('#prod-id').val()) {
+            return true;
+        }
+        return element.files && element.files.length > 0;
+    }, 'Please select at least one product image.');
+
+    $.validator.addMethod('imageFile', function(value, element) {
+        if (!element.files || !element.files.length) {
+            return true;
+        }
+        return Array.from(element.files).every(function(file) {
+            return /\.(jpe?g|png|gif|webp)$/i.test(file.name);
+        });
+    }, 'Please upload valid image files (jpg, jpeg, png, gif, webp).');
+
+    function submitProductForm(form) {
         $('#form-error').text('');
         $('#form-success').text('');
 
         const prodId = $('#prod-id').val();
-        const formData = new FormData(this);
+        const formData = new FormData(form);
 
-        // Remove empty prod-id so it doesn't create a field named "id" on create
         if (!prodId) { formData.delete('id'); }
 
         const isEdit = !!prodId;
@@ -121,7 +138,74 @@ $(document).ready(function() {
                 $('#form-error').text(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Operation failed.');
             }
         });
+    }
+
+    $('#product-form').validate({
+        rules: {
+            name: {
+                required: true,
+                minlength: 2,
+                maxlength: 100
+            },
+            category_id: {
+                required: true
+            },
+            description: {
+                maxlength: 500
+            },
+            price: {
+                required: true,
+                number: true,
+                min: 0.01
+            },
+            stock: {
+                required: true,
+                digits: true,
+                min: 0
+            },
+            status: {
+                required: true
+            },
+            images: {
+                requireImagesOnCreate: true,
+                imageFile: true
+            }
+        },
+        messages: {
+            name: {
+                required: 'Product name is required.',
+                minlength: 'Product name must be at least 2 characters.',
+                maxlength: 'Product name cannot exceed 100 characters.'
+            },
+            category_id: {
+                required: 'Please select a category.'
+            },
+            description: {
+                maxlength: 'Description cannot exceed 500 characters.'
+            },
+            price: {
+                required: 'Price is required.',
+                number: 'Price must be a valid number.',
+                min: 'Price must be greater than 0.'
+            },
+            stock: {
+                required: 'Stock quantity is required.',
+                digits: 'Stock must be a whole number.',
+                min: 'Stock cannot be negative.'
+            },
+            status: {
+                required: 'Please select a status.'
+            }
+        },
+        errorPlacement: function(error, element) {
+            error.appendTo('#' + element.attr('id') + '-error');
+        },
+        submitHandler: function(form) {
+            submitProductForm(form);
+        }
     });
+
+    // Create / Update product — handled by jQuery Validate submitHandler
 
     // Edit product
     $(document).on('click', '.edit-btn', function() {
@@ -138,6 +222,8 @@ $(document).ready(function() {
                 $('#prod-price').val(p.price);
                 $('#prod-stock').val(p.stock);
                 $('#prod-status').val(p.status);
+                PrettyPettyUI.refreshSelectmenu('#prod-category');
+                PrettyPettyUI.refreshSelectmenu('#prod-status');
                 $('#submit-btn').text('Update Product');
                 $('#cancel-edit-btn').show();
 
@@ -163,16 +249,17 @@ $(document).ready(function() {
 
     // Delete product
     $(document).on('click', '.delete-btn', function() {
-        if (!confirm('Are you sure you want to delete this product?')) return;
         const id = $(this).data('id');
-        $.ajax({
-            url: API + '/api/products/' + id,
-            method: 'DELETE',
-            headers: { Authorization: 'Bearer ' + token },
-            success: function() {
-                loadProducts();
-            },
-            error: function() { $('#form-error').text('Failed to delete product.'); }
+        PrettyPettyUI.confirm('Are you sure you want to delete this product?', function() {
+            $.ajax({
+                url: API + '/api/products/' + id,
+                method: 'DELETE',
+                headers: { Authorization: 'Bearer ' + token },
+                success: function() {
+                    loadProducts();
+                },
+                error: function() { $('#form-error').text('Failed to delete product.'); }
+            });
         });
     });
 
@@ -197,6 +284,8 @@ $(document).ready(function() {
     });
 
     function resetProductForm() {
+        const validator = $('#product-form').validate();
+        validator.resetForm();
         $('#product-form')[0].reset();
         $('#prod-id').val('');
         $('#submit-btn').text('Add Product');
@@ -204,6 +293,7 @@ $(document).ready(function() {
         $('#existing-images-container').empty();
         $('#form-success').text('');
         $('#form-error').text('');
+        $('.error-text').empty();
     }
 
     loadProducts();

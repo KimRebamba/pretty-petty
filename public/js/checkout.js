@@ -7,6 +7,8 @@ $(document).ready(function () {
         return;
     }
 
+    PrettyPettyUI.initButtons('button, input[type="submit"]');
+
     // ── User bar ──
     function initUserBar() {
         const user = JSON.parse(localStorage.getItem('user') || '{}');

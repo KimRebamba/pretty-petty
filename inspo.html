@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pretty Petty</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #fafaf8;
+      color: #1a1a1a;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #d4d4d0; border-radius: 2px; }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade { opacity: 0; animation: fade 0.8s ease-out forwards; }
+    .d1 { animation-delay: 0.15s; }
+    .d2 { animation-delay: 0.3s; }
+    .d3 { animation-delay: 0.45s; }
+    .d4 { animation-delay: 0.6s; }
+    .d5 { animation-delay: 0.75s; }
+    .d6 { animation-delay: 0.9s; }
+
+    .product-card .img-wrap img {
+  opacity: 0.85;
+  transition: opacity 0.35s ease;
+}
+
+.product-card:hover .img-wrap img {
+  opacity: 1;
+}
+
+    .product-card .add-btn {
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .product-card:hover .add-btn {
+      opacity: 1;
+    }
+
+    .toast {
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    input:focus { outline: none; border-color: #1a1a1a; }
+
+    a { text-decoration: none; color: inherit; }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-[#fafaf8]/90 backdrop-blur-md">
+    <div class="max-w-6xl mx-auto px-6 lg:px-12 h-14 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2.5">
+        <img src="https://z-cdn-media.chatglm.cn/files/5801eb8e-aa42-48f3-ab83-34f3df6d6f09.png?auth_key=1882555261-f3e833e2be5e4119b761a550218b40c9-0-256dd915f96bb771bb0b59fe342cb4ff" alt="" class="h-8 w-8 rounded-full object-cover">
+        <span class="text-[13px] font-medium tracking-[0.02em]">Pretty Petty</span>
+      </a>
+      <div class="hidden md:flex items-center gap-10">
+        <a href="#categories" class="text-[11px] tracking-[0.08em] uppercase text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors duration-300">Category</a>
+        <a href="#shop" class="text-[11px] tracking-[0.08em] uppercase text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors duration-300">Shop</a>
+        <a href="#about" class="text-[11px] tracking-[0.08em] uppercase text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors duration-300">About</a>
+        <a href="#journal" class="text-[11px] tracking-[0.08em] uppercase text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors duration-300">Journal</a>
+      </div>
+      <div class="flex items-center gap-5">
+        <button id="searchBtn" class="text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">
+          <span class="iconify text-[16px]" data-icon="lucide:search"></span>
+        </button>
+        <button id="cartBtn" class="relative text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">
+          <span class="iconify text-[16px]" data-icon="lucide:shopping-bag"></span>
+          <span id="cartCount" class="absolute -top-1 -right-1.5 w-4 h-4 bg-[#1a1a1a] rounded-full text-[9px] font-medium text-white items-center justify-center" style="display:none;">0</span>
+        </button>
+        <button id="mobileMenuBtn" class="md:hidden text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">
+          <span class="iconify text-[16px]" data-icon="lucide:menu"></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobileMenu" class="fixed inset-0 z-40 hidden">
+    <div class="absolute inset-0 bg-black/10 backdrop-blur-sm" id="mobileMenuOverlay"></div>
+    <div class="absolute right-0 top-0 bottom-0 w-56 bg-[#fafaf8] border-l border-[#e8e8e5] p-8 pt-20">
+      <a href="#categories" class="block py-3 text-[11px] tracking-[0.08em] uppercase text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">Category</a>
+      <a href="#shop" class="block py-3 text-[11px] tracking-[0.08em] uppercase text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">Shop</a>
+      <a href="#about" class="block py-3 text-[11px] tracking-[0.08em] uppercase text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">About</a>
+      <a href="#journal" class="block py-3 text-[11px] tracking-[0.08em] uppercase text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">Journal</a>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div id="searchModal" class="fixed inset-0 z-50 items-center justify-center p-6" style="display:none;">
+    <div class="absolute inset-0 bg-black/10 backdrop-blur-sm" id="searchOverlay"></div>
+    <div class="relative w-full max-w-md bg-white rounded-lg p-1 border border-[#e8e8e5] fade">
+      <div class="flex items-center gap-3 px-4">
+        <span class="iconify text-[#1a1a1a] text-sm" data-icon="lucide:search"></span>
+        <input id="searchInput" type="text" placeholder="Search products..." class="flex-1 py-3.5 text-[13px] text-[#1a1a1a] placeholder:text-[#1a1a1a] border-none bg-transparent">
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero -->
+  <section class="pt-14">
+    <div class="max-w-6xl mx-auto px-6 lg:px-12">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-0 lg:gap-0 min-h-[85vh] items-center">
+        <div class="py-20 lg:py-0 lg:pr-16">
+          <p class="text-[11px] tracking-[0.15em] uppercase text-[#1a1a1a] mb-8 fade">New Collection — Autumn 2025</p>
+          <h1 class="text-[32px] md:text-[48px] lg:text-[56px] font-light leading-[1.15] tracking-[-0.02em] text-[#1a1a1a] fade d1">
+            For pets who<br>deserve <em class="not-italic font-medium">simplicity</em>
+          </h1>
+          <p class="text-[13px] text-[#1a1a1a] leading-[1.8] mt-8 max-w-sm fade d2">
+            Thoughtfully selected essentials. No excess, no compromise — just what your companion truly needs.
+          </p>
+          <div class="mt-12 fade d3">
+            <a href="#shop" class="inline-block text-[11px] tracking-[0.1em] uppercase text-[#1a1a1a] border-b border-[#1a1a1a] pb-1 hover:opacity-60 transition-opacity duration-300">
+              View Collection
+            </a>
+          </div>
+        </div>
+        <div class="fade d2">
+          <div class="aspect-[4/5] bg-[#f0efec] rounded-sm overflow-hidden">
+            <img src="https://picsum.photos/seed/jp-minimal-pet/800/1000.jpg" alt="" class="w-full h-full object-cover opacity-80">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Thin Divider -->
+  <div class="max-w-6xl mx-auto px-6 lg:px-12"><div class="border-t border-[#e8e8e5]"></div></div>
+
+  <!-- Categories -->
+  <section id="categories" class="py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6 lg:px-12">
+      <p class="text-[11px] tracking-[0.15em] uppercase text-[#1a1a1a] mb-10 fade">Categories</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+        <a href="#" class="group fade d1">
+          <div class="aspect-square bg-[#f0efec] rounded-sm overflow-hidden mb-4">
+            <img src="https://picsum.photos/seed/jp-cat-dog/500/500.jpg" alt="" class="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition-opacity duration-300">
+          </div>
+          <p class="text-[12px] font-medium text-[#1a1a1a]">Dogs</p>
+          <p class="text-[11px] text-[#1a1a1a] mt-0.5">128 items</p>
+        </a>
+        <a href="#" class="group fade d2">
+          <div class="aspect-square bg-[#f0efec] rounded-sm overflow-hidden mb-4">
+            <img src="https://picsum.photos/seed/jp-cat-cat/500/500.jpg" alt="" class="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition-opacity duration-300">
+          </div>
+          <p class="text-[12px] font-medium text-[#1a1a1a]">Cats</p>
+          <p class="text-[11px] text-[#1a1a1a] mt-0.5">96 items</p>
+        </a>
+        <a href="#" class="group fade d3">
+          <div class="aspect-square bg-[#f0efec] rounded-sm overflow-hidden mb-4">
+            <img src="https://picsum.photos/seed/jp-cat-bird/500/500.jpg" alt="" class="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition-opacity duration-300">
+          </div>
+          <p class="text-[12px] font-medium text-[#1a1a1a]">Birds</p>
+          <p class="text-[11px] text-[#1a1a1a] mt-0.5">54 items</p>
+        </a>
+        <a href="#" class="group fade d4">
+          <div class="aspect-square bg-[#f0efec] rounded-sm overflow-hidden mb-4">
+            <img src="https://picsum.photos/seed/jp-cat-fish/500/500.jpg" alt="" class="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition-opacity duration-300">
+          </div>
+          <p class="text-[12px] font-medium text-[#1a1a1a]">Fish</p>
+          <p class="text-[11px] text-[#1a1a1a] mt-0.5">42 items</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-6xl mx-auto px-6 lg:px-12"><div class="border-t border-[#e8e8e5]"></div></div>
+
+  <!-- Products -->
+  <section id="shop" class="py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6 lg:px-12">
+      <div class="flex items-end justify-between mb-12">
+        <div>
+          <p class="text-[11px] tracking-[0.15em] uppercase text-[#1a1a1a] mb-2 fade">Selection</p>
+          <h2 class="text-[24px] md:text-[30px] font-light tracking-[-0.01em] text-[#1a1a1a] fade d1">All Products</h2>
+        </div>
+        <div class="hidden md:flex items-center gap-1 fade d1">
+          <button class="filter-tab text-[11px] tracking-[0.05em] px-3 py-1.5 text-[#1a1a1a] border-b border-[#1a1a1a]" data-filter="all">All</button>
+          <button class="filter-tab text-[11px] tracking-[0.05em] px-3 py-1.5 text-[#1a1a1a] border-b border-transparent hover:text-[#1a1a1a] transition-colors" data-filter="food">Food</button>
+          <button class="filter-tab text-[11px] tracking-[0.05em] px-3 py-1.5 text-[#1a1a1a] border-b border-transparent hover:text-[#1a1a1a] transition-colors" data-filter="toys">Toys</button>
+          <button class="filter-tab text-[11px] tracking-[0.05em] px-3 py-1.5 text-[#1a1a1a] border-b border-transparent hover:text-[#1a1a1a] transition-colors" data-filter="accessories">Accessories</button>
+          <button class="filter-tab text-[11px] tracking-[0.05em] px-3 py-1.5 text-[#1a1a1a] border-b border-transparent hover:text-[#1a1a1a] transition-colors" data-filter="grooming">Grooming</button>
+        </div>
+      </div>
+
+      <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-10 md:gap-x-8 md:gap-y-14">
+        <div class="product-card fade d1" data-category="food">
+          <div class="relative img-wrap">
+            <div class="aspect-square bg-[#f0efec] rounded-sm overflow-hidden">
+              <img src="https://picsum.photos/seed/jp-prod-food/600/600.jpg" alt="" class="w-full h-full object-cover opacity-75">
+            </div>
+            <button class="add-btn absolute bottom-3 right-3 w-8 h-8 bg-white border border-[#e8e8e5] rounded-full flex items-center justify-center hover:bg-[#1a1a1a] hover:text-white hover:border-[#1a1a1a] transition-all duration-200" onclick="addToCart('Wild Salmon Dry Food', 34.99)">
+              <span class="iconify text-[13px]" data-icon="lucide:plus"></span>
+            </button>
+          </div>
+          <div class="mt-4">
+            <p class="text-[10px] tracking-[0.1em] uppercase text-[#1a1a1a]">Food</p>
+            <h3 class="text-[13px] font-medium text-[#1a1a1a] mt-1 leading-snug">Wild Salmon Dry Food</h3>
+            <p class="text-[13px] text-[#1a1a1a] mt-1.5">$34.99</p>
+          </div>
+        </div>
+
+        <div class="product-card fade d2" data-category="toys">
+          <div class="relative img-wrap">
+            <div class="aspect-square bg-[#f0efec] rounded-sm overflow-hidden">
+              <img src="https://picsum.photos/seed/jp-prod-rope/600/600.jpg" alt="" class="w-full h-full object-cover opacity-75">
+            </div>
+            <button class="add-btn absolute bottom-3 right-3 w-8 h-8 bg-white border border-[#e8e8e5] rounded-full flex items-center justify-center hover:bg-[#1a1a1a] hover:text-white hover:border-[#1a1a1a] transition-all duration-200" onclick="addToCart('Hemp Rope Toy Set', 18.99)">
+              <span class="iconify text-[13px]" data-icon="lucide:plus"></span>
+            </button>
+          </div>
+          <div class="mt-4">
+            <p class="text-[10px] tracking-[0.1em] uppercase text-[#1a1a1a]">Toys</p>
+            <h3 class="text-[13px] font-medium text-[#1a1a1a] mt-1 leading-snug">Hemp Rope Toy Set</h3>
+            <p class="text-[13px] text-[#1a1a1a] mt-1.5">$18.99</p>
+          </div>
+        </div>
+
+        <div class="product-card fade d3" data-category="accessories">
+          <div class="relative img-wrap">
+            <div class="aspect-square bg-[#f0efec] rounded-sm overflow-hidden">
+              <img src="https://picsum.photos/seed/jp-prod-collar/600/600.jpg" alt="" class="w-full h-full object-cover opacity-75">
+            </div>
+            <button class="add-btn absolute bottom-3 right-3 w-8 h-8 bg-white border border-[#e8e8e5] rounded-full flex items-center justify-center hover:bg-[#1a1a1a] hover:text-white hover:border-[#1a1a1a] transition-all duration-200" onclick="addToCart('Leather Collar', 56.00)">
+              <span class="iconify text-[13px]" data-icon="lucide:plus"></span>
+            </button>
+          </div>
+          <div class="mt-4">
+            <p class="text-[10px] tracking-[0.1em] uppercase text-[#1a1a1a]">Accessories</p>
+            <h3 class="text-[13px] font-medium text-[#1a1a1a] mt-1 leading-snug">Italian Leather Collar</h3>
+            <p class="text-[13px] text-[#1a1a1a] mt-1.5">$56.00</p>
+          </div>
+        </div>
+
+        <div class="product-card fade d1" data-category="grooming">
+          <div class="relative img-wrap">
+            <div class="aspect-square bg-[#f0efec] rounded-sm overflow-hidden">
+              <img src="https://picsum.photos/seed/jp-prod-brush/600/600.jpg" alt="" class="w-full h-full object-cover opacity-75">
+            </div>
+            <button class="add-btn absolute bottom-3 right-3 w-8 h-8 bg-white border border-[#e8e8e5] rounded-full flex items-center justify-center hover:bg-[#1a1a1a] hover:text-white hover:border-[#1a1a1a] transition-all duration-200" onclick="addToCart('Grooming Brush Set', 27.50)">
+              <span class="iconify text-[13px]" data-icon="lucide:plus"></span>
+            </button>
+          </div>
+          <div class="mt-4">
+            <p class="text-[10px] tracking-[0.1em] uppercase text-[#1a1a1a]">Grooming</p>
+            <h3 class="text-[13px] font-medium text-[#1a1a1a] mt-1 leading-snug">Brush Set — 5 Pieces</h3>
+            <p class="text-[13px] text-[#1a1a1a] mt-1.5">$27.50</p>
+          </div>
+        </div>
+
+        <div class="product-card fade d2" data-category="food">
+          <div class="relative img-wrap">
+            <div class="aspect-square bg-[#f0efec] rounded-sm overflow-hidden">
+              <img src="https://picsum.photos/seed/jp-prod-treat/600/600.jpg" alt="" class="w-full h-full object-cover opacity-75">
+            </div>
+            <button class="add-btn absolute bottom-3 right-3 w-8 h-8 bg-white border border-[#e8e8e5] rounded-full flex items-center justify-center hover:bg-[#1a1a1a] hover:text-white hover:border-[#1a1a1a] transition-all duration-200" onclick="addToCart('Organic Training Treats', 14.99)">
+              <span class="iconify text-[13px]" data-icon="lucide:plus"></span>
+            </button>
+          </div>
+          <div class="mt-4">
+            <p class="text-[10px] tracking-[0.1em] uppercase text-[#1a1a1a]">Food</p>
+            <h3 class="text-[13px] font-medium text-[#1a1a1a] mt-1 leading-snug">Organic Training Treats</h3>
+            <p class="text-[13px] text-[#1a1a1a] mt-1.5">$14.99</p>
+          </div>
+        </div>
+
+        <div class="product-card fade d3" data-category="accessories">
+          <div class="relative img-wrap">
+            <div class="aspect-square bg-[#f0efec] rounded-sm overflow-hidden">
+              <img src="https://picsum.photos/seed/jp-prod-bed/600/600.jpg" alt="" class="w-full h-full object-cover opacity-75">
+            </div>
+            <button class="add-btn absolute bottom-3 right-3 w-8 h-8 bg-white border border-[#e8e8e5] rounded-full flex items-center justify-center hover:bg-[#1a1a1a] hover:text-white hover:border-[#1a1a1a] transition-all duration-200" onclick="addToCart('Cloud Comfort Bed', 89.00)">
+              <span class="iconify text-[13px]" data-icon="lucide:plus"></span>
+            </button>
+          </div>
+          <div class="mt-4">
+            <p class="text-[10px] tracking-[0.1em] uppercase text-[#1a1a1a]">Accessories</p>
+            <h3 class="text-[13px] font-medium text-[#1a1a1a] mt-1 leading-snug">Cloud Comfort Bed</h3>
+            <p class="text-[13px] text-[#1a1a1a] mt-1.5">$89.00</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-6xl mx-auto px-6 lg:px-12"><div class="border-t border-[#e8e8e5]"></div></div>
+
+  <!-- About / Philosophy -->
+  <section id="about" class="py-20 md:py-28">
+    <div class="max-w-6xl mx-auto px-6 lg:px-12">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <div class="aspect-square bg-[#f0efec] rounded-sm overflow-hidden fade">
+          <img src="https://picsum.photos/seed/jp-philosophy/800/800.jpg" alt="" class="w-full h-full object-cover opacity-70">
+        </div>
+        <div>
+          <p class="text-[11px] tracking-[0.15em] uppercase text-[#1a1a1a] mb-6 fade">Philosophy</p>
+          <h2 class="text-[24px] md:text-[30px] font-light tracking-[-0.01em] text-[#1a1a1a] leading-[1.4] fade d1">
+            Less, but better.<br>We believe in quiet quality.
+          </h2>
+          <p class="text-[13px] text-[#1a1a1a] leading-[2] mt-8 fade d2">
+            Every product in our collection has been chosen for a reason. We work with small makers who share our values — craftsmanship, sustainability, and a deep respect for the animals we serve.
+          </p>
+          <p class="text-[13px] text-[#1a1a1a] leading-[2] mt-4 fade d3">
+            No gimmicks. No trends. Just essentials that last, made with care, designed to blend quietly into your home.
+          </p>
+          <div class="mt-10 fade d4">
+            <a href="#" class="inline-block text-[11px] tracking-[0.1em] uppercase text-[#1a1a1a] border-b border-[#1a1a1a] pb-1 hover:opacity-60 transition-opacity duration-300">
+              Our Story
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="max-w-6xl mx-auto px-6 lg:px-12"><div class="border-t border-[#e8e8e5]"></div></div>
+
+
+  <div class="max-w-6xl mx-auto px-6 lg:px-12"><div class="border-t border-[#e8e8e5]"></div></div>
+
+  <div class="max-w-6xl mx-auto px-6 lg:px-12"><div class="border-t border-[#e8e8e5]"></div></div>
+
+  <!-- Footer -->
+  <footer class="py-16 md:py-20">
+    <div class="max-w-6xl mx-auto px-6 lg:px-12">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-8 mb-16">
+        <div class="col-span-2 md:col-span-1">
+          <div class="flex items-center gap-2 mb-5">
+            <img src="https://z-cdn-media.chatglm.cn/files/5801eb8e-aa42-48f3-ab83-34f3df6d6f09.png?auth_key=1882555261-f3e833e2be5e4119b761a550218b40c9-0-256dd915f96bb771bb0b59fe342cb4ff" alt="" class="h-7 w-7 rounded-full object-cover">
+            <span class="text-[12px] font-medium">Pretty Petty</span>
+          </div>
+          <p class="text-[11px] text-[#1a1a1a] leading-[1.8] max-w-[200px]">
+            Thoughtful essentials for the animals you love.
+          </p>
+        </div>
+        <div>
+          <p class="text-[10px] tracking-[0.15em] uppercase text-[#1a1a1a] mb-4">Shop</p>
+          <ul class="space-y-2.5">
+            <li><a href="#" class="text-[11px] text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">Dogs</a></li>
+            <li><a href="#" class="text-[11px] text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">Cats</a></li>
+            <li><a href="#" class="text-[11px] text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">Birds</a></li>
+            <li><a href="#" class="text-[11px] text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">Fish</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-[10px] tracking-[0.15em] uppercase text-[#1a1a1a] mb-4">Info</p>
+          <ul class="space-y-2.5">
+            <li><a href="#" class="text-[11px] text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">About</a></li>
+            <li><a href="#" class="text-[11px] text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">Journal</a></li>
+            <li><a href="#" class="text-[11px] text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">Sustainability</a></li>
+            <li><a href="#" class="text-[11px] text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">Contact</a></li>
+          </ul>
+        </div>
+        <div>
+          <p class="text-[10px] tracking-[0.15em] uppercase text-[#1a1a1a] mb-4">Support</p>
+          <ul class="space-y-2.5">
+            <li><a href="#" class="text-[11px] text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">Shipping</a></li>
+            <li><a href="#" class="text-[11px] text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">Returns</a></li>
+            <li><a href="#" class="text-[11px] text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">FAQ</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-[#f0efec] pt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <p class="text-[10px] text-[#1a1a1a]">© 2025 Pretty Petty</p>
+        <div class="flex items-center gap-5">
+          <a href="#" class="text-[10px] text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">Privacy</a>
+          <a href="#" class="text-[10px] text-[#1a1a1a] hover:text-[#1a1a1a] transition-colors">Terms</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div id="toast" class="toast fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-white border border-[#e8e8e5] rounded-sm px-5 py-3 flex items-center gap-3">
+    <p id="toastSubtitle" class="text-[12px] text-[#1a1a1a]">Added — $34.99</p>
+  </div>
+
+  <script>
+    let cartItems = 0;
+    const cartCount = document.getElementById('cartCount');
+    const toast = document.getElementById('toast');
+    const toastSubtitle = document.getElementById('toastSubtitle');
+    let toastTimeout;
+
+    function addToCart(name, price) {
+      cartItems++;
+      cartCount.textContent = cartItems;
+      cartCount.style.display = 'flex';
+      toastSubtitle.textContent = `${name} — $${price.toFixed(2)}`;
+      toast.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    const searchBtn = document.getElementById('searchBtn');
+    const searchModal = document.getElementById('searchModal');
+    const searchOverlay = document.getElementById('searchOverlay');
+    const searchInput = document.getElementById('searchInput');
+
+    searchBtn.addEventListener('click', () => {
+      searchModal.style.display = 'flex';
+      setTimeout(() => searchInput.focus(), 100);
+    });
+    searchOverlay.addEventListener('click', () => searchModal.style.display = 'none');
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') searchModal.style.display = 'none';
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        searchModal.style.display = 'flex';
+        setTimeout(() => searchInput.focus(), 100);
+      }
+    });
+
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+
+    mobileMenuBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+    mobileMenuOverlay.addEventListener('click', () => mobileMenu.classList.add('hidden'));
+    mobileMenu.querySelectorAll('a').forEach(l => l.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+
+    const filterTabs = document.querySelectorAll('.filter-tab');
+    const productCards = document.querySelectorAll('.product-card');
+
+    filterTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        filterTabs.forEach(t => {
+          t.classList.remove('text-[#1a1a1a]', 'border-[#1a1a1a]');
+          t.classList.add('text-[#1a1a1a]', 'border-transparent');
+        });
+        tab.classList.add('text-[#1a1a1a]', 'border-[#1a1a1a]');
+        tab.classList.remove('text-[#1a1a1a]', 'border-transparent');
+
+        const filter = tab.dataset.filter;
+        productCards.forEach(card => {
+          if (filter === 'all' || card.dataset.category === filter) {
+            card.style.display = '';
+            card.style.opacity = '0';
+            setTimeout(() => {
+              card.style.transition = 'opacity 0.5s ease';
+              card.style.opacity = '1';
+            }, 30);
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    document.getElementById('newsletterForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      document.getElementById('formMessage').classList.remove('hidden');
+      document.getElementById('emailInput').value = '';
+      setTimeout(() => document.getElementById('formMessage').classList.add('hidden'), 3000);
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animationPlayState = 'running';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade').forEach(el => {
+      el.style.animationPlayState = 'paused';
+      observer.observe(el);
+    });
+    document.querySelectorAll('section:first-of-type .fade').forEach(el => {
+      el.style.animationPlayState = 'running';
+    });
+  </script>
+</body>
+</html>

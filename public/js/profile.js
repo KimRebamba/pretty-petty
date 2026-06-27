@@ -11,6 +11,8 @@ $(document).ready(function () {
         return;
     }
 
+    PrettyPettyUI.initButtons('button, input[type="submit"]');
+
     // User bar
     if (user.first_name || user.last_name) {
         $('#user-display-name').text('Hi, ' + (user.first_name || '') + ' ' + (user.last_name || ''));

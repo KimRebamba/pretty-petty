@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pretty Petty - Admin Categories</title>
-      
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
 </head>
 <body>
 
@@ -45,14 +46,14 @@
 
         <!-- CATEGORY FORM (Create & Edit) -->
         <!-- Quiz 4 Validation will target the error spans below -->
-        <form id="category-form" style="margin-bottom: 30px;">
+        <form id="category-form" novalidate style="margin-bottom: 30px;">
             
             <!-- Hidden ID field for editing existing categories -->
             <input type="hidden" id="cat-id" name="id" value="">
 
             <div>
                 <label for="cat-name">Category Name:</label><br>
-                <input type="text" id="cat-name" name="name" required>
+                <input type="text" id="cat-name" name="name">
                 <span class="error-text" id="cat-name-error" style="color: red;"></span>
             </div>
             <br>
@@ -66,7 +67,7 @@
 
             <div>
                 <label for="cat-status">Status:</label><br>
-                <select id="cat-status" name="status" required>
+                <select id="cat-status" name="status">
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
                 </select>
@@ -136,6 +137,9 @@
     </footer>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
+<script src="/js/ui-common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.20.0/dist/jquery.validate.min.js"></script>
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
 <script src="/js/admin-categories.js"></script>

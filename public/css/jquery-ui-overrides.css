@@ -1,0 +1,25 @@
+/* Pretty Petty — jQuery UI tweaks */
+
+.ui-autocomplete {
+    max-height: 280px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1000;
+}
+
+.ui-menu-item-wrapper {
+    font-size: 14px;
+    padding: 8px 12px !important;
+}
+
+#search-input.ui-autocomplete-input {
+    min-width: 280px;
+}
+
+.ui-dialog-titlebar {
+    font-weight: 600;
+}
+
+.ui-tabs .ui-tabs-panel {
+    padding: 1em 0.2em;
+}

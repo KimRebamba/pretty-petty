@@ -6,6 +6,10 @@ $(document).ready(function () {
     const urlParams = new URLSearchParams(window.location.search);
     const productId = urlParams.get('id');
 
+    PrettyPettyUI.apiBase = API;
+    PrettyPettyUI.initButtons('button');
+    PrettyPettyUI.initProductSearchAutocomplete();
+
     if (!productId) {
         $('#p-name').text('No product specified.');
         return;
@@ -62,18 +66,7 @@ $(document).ready(function () {
         window.location.href = '/login.html';
     });
 
-    // ── Live search: filter products ──
-    let searchTimer = null;
-    $('#search-input').on('keyup', function () {
-        const query = $(this).val().trim().toLowerCase();
-        clearTimeout(searchTimer);
-        searchTimer = setTimeout(function () {
-            // On product details page, redirect to products page with search query
-            if (query.length > 0) {
-                window.location.href = 'products.html?search=' + encodeURIComponent(query);
-            }
-        }, 200);
-    });
+    // ── Live search handled by jQuery UI autocomplete (ui-common.js) ──
 
     // ── Load product ──
     $.get(API + '/api/products/' + productId, function (product) {
