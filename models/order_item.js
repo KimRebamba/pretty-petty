@@ -36,8 +36,7 @@ const Order_Item = sequelize.define("Order_Item", {
 }, {
     tableName: "order_items",
     timestamps: false,
-    paranoid: true,
-    deletedAt: 'deleted_at'
+
 });
 
 module.exports = Order_Item;

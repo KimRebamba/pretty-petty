@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretty Petty - Shopping Cart</title>
+     
+</head>
+<body>
+
+    <header>
+        <h1>Pretty Petty</h1>
+        <nav>
+            <a href="index.html">Home</a> | 
+            <a href="products.html">Products</a> | 
+            <a href="cart.html">Cart (<span class="cart-count">0</span>)</a> | 
+            <a href="profile-orders.html">My Orders</a> | 
+            <a href="profile-reviews.html">My Reviews</a> | 
+            <a href="profile.html">Profile</a> | 
+            <span id="nav-auth">
+                <a href="login.html">Login</a> | 
+                <a href="register.html">Register</a>
+            </span>
+            <span id="nav-user" style="display: none;">
+                <a href="#" id="logout-link">Logout</a>
+            </span>
+        </nav>
+        <div id="user-bar" style="display: none; align-items: center; gap: 10px; margin-top: 5px; font-size: 14px;">
+            <img id="user-avatar" src="/uploads/default.png" width="25" height="25" style="border-radius: 50%;">
+            <span id="user-display-name"></span>
+            <a href="#" id="logout-link" style="margin-left: 10px;">Logout</a>
+        </div>
+    </header>
+
+    <hr>
+
+    <!-- QUIZ 5 REQUIREMENT: Search / Autocomplete -->
+    <div>
+        <label for="search-input">Search Products:</label>
+        <input type="text" id="search-input" name="search" placeholder="Search for pet food, toys, etc...">
+        <ul id="search-results-dropdown" style="display: none; list-style-type: none; padding: 0; margin: 0;"></ul>
+    </div>
+
+    <hr>
+
+    <main>
+        
+        <h2>Shopping Cart</h2>
+
+        <!-- General error message (e.g., "Failed to update quantity" or "Item out of stock") -->
+        <div id="cart-error" style="color: red;"></div>
+        <!-- General success message (e.g., "Cart updated") -->
+        <div id="cart-success" style="color: green;"></div>
+
+        <!-- EMPTY CART STATE -->
+        <div id="empty-cart-message" style="display: none;">
+            <p>Your cart is currently empty.</p>
+            <a href="products.html">Browse Products</a>
+        </div>
+
+        <!-- CART TABLE (Only shown if cart has items) -->
+        <div id="cart-table-container">
+            <table border="1" cellpadding="10" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="cart-items-body">
+                    <!-- jQuery will populate this by fetching /api/cart -->
+                    <!-- 
+                    Example of what jQuery will inject per row:
+                    <tr class="cart-row" data-cart-item-id="12" data-product-id="5">
+                        <td>Dog Food Bag</td>
+                        <td class="item-price" data-price="19.99">$19.99</td>
+                        <td>
+                            <input type="number" class="quantity-input" value="2" min="1" style="width: 50px;">
+                            <button class="update-qty-btn">Update</button>
+                            <span class="error-text qty-error" style="color: red;"></span>
+                        </td>
+                        <td class="item-subtotal">$39.98</td>
+                        <td><button class="remove-item-btn">Remove</button></td>
+                    </tr>
+                    -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="text-align: right;"><strong>Grand Total:</strong></td>
+                        <td colspan="2"><strong id="grand-total">$0.00</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <br>
+
+            <div>
+                <a href="products.html">Continue Shopping</a> | 
+                <a href="checkout.html" id="proceed-to-checkout-btn">Proceed to Checkout</a>
+            </div>
+        </div>
+
+    </main>
+
+    <hr>
+
+    <footer>
+        <p>&copy; 2023 Pretty Petty. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/cart.js"></script>
+</body>
+</html>

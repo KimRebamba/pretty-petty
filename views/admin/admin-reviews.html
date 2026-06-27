@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretty Petty - Admin Reviews</title>
+      
+</head>
+<body>
+
+    <header>
+        <h1>Pretty Petty Admin</h1>
+        <nav>
+            <a href="/admin/dashboard.html">Dashboard</a> | 
+            <a href="/admin/products.html">Products</a> | 
+            <a href="/admin/categories.html">Categories</a> | 
+            <a href="/admin/users.html">Users</a> | 
+            <a href="/admin/orders.html">Orders</a> | 
+            <a href="/admin/reviews.html">Reviews</a> | 
+            <a href="/index.html">View Store</a> | 
+            <a href="/profile.html">Profile</a> | 
+            <a href="#" id="logout-btn">Logout</a>
+        </nav>
+        <div id="user-info" style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+            <img id="user-avatar" src="/uploads/default.png" width="30" height="30" style="border-radius: 50%;">
+            <span id="user-display-name">Admin</span>
+            <span id="user-role-badge" style="background: #007bff; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">ADMIN</span>
+        </div>
+    </header>
+
+    <hr>
+
+    <main>
+        <div id="access-denied" style="display: none; color: red; text-align: center; padding: 20px;">
+            <h2>Access Denied</h2>
+            <p>You do not have admin privileges. Only administrators can access this page.</p>
+            <a href="/login.html">Go to Login</a> | <a href="/index.html">Go to Store</a>
+        </div>
+        <div id="admin-content">
+        <h2>Manage Customer Reviews</h2>
+
+        <!-- General Action Messages -->
+        <div id="action-success" style="color: green;"></div>
+        <div id="action-error" style="color: red;"></div>
+
+        <!-- REVIEWS TABLE -->
+        <!-- jQuery/Datatable will populate this via a GET /api/reviews endpoint -->
+        <!-- Tip for Node.js: You should use Sequelize 'include' to join users and products tables 
+             so you can display the actual User Name and Product Name, not just the IDs. -->
+        <table id="reviews-table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th>Review ID</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Rating</th>
+                    <th>Comment</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="reviews-tbody">
+                <!-- jQuery will populate these rows -->
+                <!-- 
+                Example of what jQuery will inject:
+                <tr>
+                    <td>1</td>
+                    <td>John Doe (ID: 5)</td>
+                    <td>Premium Dog Food (ID: 12)</td>
+                    <td>5 / 5</td>
+                    <td>My dog loved this food! Very healthy.</td>
+                    <td class="verify-status">
+                        Pending 
+                        <span class="error-text" id="verify-error-1" style="color: red;"></span>
+                    </td>
+                    <td>2023-10-25</td>
+                    <td>
+                        <button class="verify-btn" data-id="1">Verify Review</button>
+                        <button class="delete-btn" data-id="1">Delete</button>
+                    </td>
+                </tr>
+                -->
+                <tr>
+                    <td colspan="8" style="text-align: center;">Loading reviews...</td>
+                </tr>
+            </tbody>
+        </table>
+        </div>
+    </main>
+
+    <hr>
+
+    <footer>
+        <p>&copy; 2023 Pretty Petty Admin Panel. All rights reserved.</p>
+    </footer>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="/js/admin-reviews.js"></script>
+</body>
+</html>

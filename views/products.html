@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretty Petty - Our Products</title>
+     
+</head>
+<body>
+
+    <header>
+        <h1>Pretty Petty</h1>
+        <nav>
+            <a href="index.html">Home</a> | 
+            <a href="products.html">Products</a> | 
+            <a href="cart.html">Cart (<span class="cart-count">0</span>)</a> | 
+            <a href="profile-orders.html">My Orders</a> | 
+            <a href="profile-reviews.html">My Reviews</a> | 
+            <a href="profile.html">Profile</a> | 
+            <span id="nav-auth">
+                <a href="login.html">Login</a> | 
+                <a href="register.html">Register</a>
+            </span>
+            <span id="nav-user" style="display: none;">
+                <a href="#" id="logout-link">Logout</a>
+            </span>
+        </nav>
+        <div id="user-bar" style="display: none; align-items: center; gap: 10px; margin-top: 5px; font-size: 14px;">
+            <img id="user-avatar" src="/uploads/default.png" width="25" height="25" style="border-radius: 50%;">
+            <span id="user-display-name"></span>
+            <a href="#" id="logout-link" style="margin-left: 10px;">Logout</a>
+        </div>
+    </header>
+
+    <hr>
+
+    <!-- Search -->
+    <div>
+        <label for="search-input">Search Products:</label>
+        <input type="text" id="search-input" name="search" placeholder="Search for pet food, toys, etc..." autocomplete="off">
+    </div>
+
+    <hr>
+
+    <main>
+        
+        <h2>All Products</h2>
+
+        <!-- FILTERS (Ties to 'categories' table) -->
+        <div>
+            <label for="category-filter">Filter by Category:</label>
+            <select id="category-filter" name="category_id">
+                <option value="">All Categories</option>
+                <!-- jQuery will append options here from /api/categories -->
+                <!-- Example: <option value="1">Dog Food</option> -->
+            </select>
+        </div>
+
+        <br>
+
+        <!-- PRODUCT LISTING GRID -->
+        <!-- jQuery will append product cards here -->
+        <div id="products-container">
+            <!-- Example of what jQuery will inject per product:
+            <div class="product-card">
+                <img src="image_path" alt="Product Name">
+                <h3>Product Name</h3>
+                <p>$19.99</p>
+                <a href="product.html?id=1">View Details</a>
+            </div>
+            -->
+        </div>
+
+        <!-- LOADING INDICATOR (Useful for UT2: Infinite Scroll) -->
+        <div id="loading-indicator" style="display: none; text-align: center;">
+            <p>Loading more products...</p>
+        </div>
+
+        <!-- NO RESULTS MESSAGE -->
+        <div id="no-results-message" style="display: none;">
+            <p>No products found matching your criteria.</p>
+        </div>
+
+        <hr>
+
+        <!-- UNIT TEST 2 REQUIREMENT: Custom jQuery Pagination -->
+        <!-- Do NOT use DataTables here. jQuery will calculate pages and render buttons inside this div -->
+        <div id="pagination-controls" style="text-align: center;">
+            <!-- jQuery will inject buttons here dynamically -->
+            <!-- Example of what jQuery will create:
+            <button class="page-btn" data-page="1" disabled>Previous</button>
+            <button class="page-btn active" data-page="1">1</button>
+            <button class="page-btn" data-page="2">2</button>
+            <button class="page-btn" data-page="3">3</button>
+            <button class="page-btn" data-page="2">Next</button>
+            -->
+        </div>
+
+    </main>
+
+    <hr>
+
+    <footer>
+        <p>&copy; 2023 Pretty Petty. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/products.js"></script>
+</body>
+</html>

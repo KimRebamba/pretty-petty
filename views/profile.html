@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretty Petty - My Profile</title>
+     
+</head>
+<body>
+
+    <header>
+        <h1>Pretty Petty</h1>
+        <nav>
+            <a href="index.html">Home</a> | 
+            <a href="products.html">Products</a> | 
+            <a href="cart.html">Cart (<span class="cart-count">0</span>)</a> | 
+            <a href="profile-orders.html">My Orders</a> | 
+            <a href="profile-reviews.html">My Reviews</a> | 
+            <a href="profile.html">Profile</a> | 
+            <span id="nav-auth">
+                <a href="login.html">Login</a> | 
+                <a href="register.html">Register</a>
+            </span>
+            <span id="nav-user" style="display: none;">
+                <a href="#" id="logout-link">Logout</a>
+            </span>
+        </nav>
+        <div id="user-bar" style="display: none; align-items: center; gap: 10px; margin-top: 5px; font-size: 14px;">
+            <img id="user-avatar" src="/uploads/default.png" width="25" height="25" style="border-radius: 50%;">
+            <span id="user-display-name"></span>
+        </div>
+    </header>
+
+    <hr>
+
+    <div id="not-logged-in" style="display: none; text-align: center; padding: 40px;">
+        <h2>Please Log In</h2>
+        <p>You need to be logged in to view your profile.</p>
+        <a href="login.html">Go to Login</a>
+    </div>
+
+    <main id="profile-content">
+        <h2>My Profile</h2>
+
+        <div id="profile-success" style="color: green;"></div>
+        <div id="profile-error" style="color: red;"></div>
+
+        <form id="profile-form" enctype="multipart/form-data" style="max-width: 500px;">
+            
+            <!-- Profile Image -->
+            <div>
+                <label>Profile Image:</label><br>
+                <div style="margin: 10px 0;">
+                    <img id="current-avatar" src="/uploads/default.png" width="100" height="100" style="border-radius: 50%; object-fit: cover; border: 2px solid #ccc;">
+                </div>
+                <input type="file" id="image" name="image" accept="image/*">
+                <span class="error-text" id="image-error" style="color: red;"></span>
+            </div>
+            <br>
+
+            <div>
+                <label for="first_name">First Name:</label><br>
+                <input type="text" id="first_name" name="first_name" required>
+                <span class="error-text" id="first_name-error" style="color: red;"></span>
+            </div>
+            <br>
+
+            <div>
+                <label for="last_name">Last Name:</label><br>
+                <input type="text" id="last_name" name="last_name" required>
+                <span class="error-text" id="last_name-error" style="color: red;"></span>
+            </div>
+            <br>
+
+            <div>
+                <label for="email">Email:</label><br>
+                <input type="email" id="email" name="email" disabled>
+                <small>Email cannot be changed.</small>
+            </div>
+            <br>
+
+            <div>
+                <label for="delivery_address">Delivery Address:</label><br>
+                <textarea id="delivery_address" name="delivery_address" rows="3" cols="50"></textarea>
+                <span class="error-text" id="delivery_address-error" style="color: red;"></span>
+            </div>
+            <br>
+
+            <div>
+                <label>Role:</label><br>
+                <span id="user-role" style="font-weight: bold;"></span>
+            </div>
+            <br>
+
+            <div>
+                <label>Account Status:</label><br>
+                <span id="user-status" style="font-weight: bold;"></span>
+            </div>
+            <br>
+
+            <div>
+                <label>Member Since:</label><br>
+                <span id="user-created"></span>
+            </div>
+            <br>
+
+            <button type="submit">Save Changes</button>
+        </form>
+    </main>
+
+    <hr>
+
+    <footer>
+        <p>&copy; 2023 Pretty Petty. All rights reserved.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/profile.js"></script>
+</body>
+</html>

@@ -26,11 +26,17 @@ Cart_Item.belongsTo(Product, { foreignKey: 'product_id', onDelete: 'CASCADE' });
 User.hasMany(Order, { foreignKey: 'user_id' });
 Order.belongsTo(User, { foreignKey: 'user_id' });
 
+Order.hasMany(Order_Item, { foreignKey: 'order_id', onDelete: 'CASCADE' });
+Order_Item.belongsTo(Order, { foreignKey: 'order_id' });
+
 Product.hasMany(Order_Item, { foreignKey: 'product_id' });
 Order_Item.belongsTo(Product, { foreignKey: 'product_id' });
 
 Product.hasMany(Review, { foreignKey: 'product_id', onDelete: 'CASCADE' });
 Review.belongsTo(Product, { foreignKey: 'product_id', onDelete: 'CASCADE' });
+
+User.hasMany(Review, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+Review.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
 
 module.exports = { 
     User, 

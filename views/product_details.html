@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretty Petty - Product Details</title>
+     
+</head>
+<body>
+
+    <header>
+        <h1>Pretty Petty</h1>
+        <nav>
+            <a href="index.html">Home</a> | 
+            <a href="products.html">Products</a> | 
+            <a href="cart.html">Cart (<span class="cart-count">0</span>)</a> | 
+            <a href="profile-orders.html">My Orders</a> | 
+            <a href="profile-reviews.html">My Reviews</a> | 
+            <a href="profile.html">Profile</a> | 
+            <span id="nav-auth">
+                <a href="login.html">Login</a> | 
+                <a href="register.html">Register</a>
+            </span>
+            <span id="nav-user" style="display: none;">
+                <a href="#" id="logout-link">Logout</a>
+            </span>
+        </nav>
+        <div id="user-bar" style="display: none; align-items: center; gap: 10px; margin-top: 5px; font-size: 14px;">
+            <img id="user-avatar" src="/uploads/default.png" width="25" height="25" style="border-radius: 50%;">
+            <span id="user-display-name"></span>
+            <a href="#" id="logout-link" style="margin-left: 10px;">Logout</a>
+        </div>
+    </header>
+
+    <hr>
+
+    <!-- QUIZ 5 REQUIREMENT: Search / Autocomplete -->
+    <div>
+        <label for="search-input">Search Products:</label>
+        <input type="text" id="search-input" name="search" placeholder="Search for pet food, toys, etc...">
+        <ul id="search-results-dropdown" style="display: none; list-style-type: none; padding: 0; margin: 0;"></ul>
+    </div>
+
+    <hr>
+
+    <main>
+        
+        <!-- PRODUCT DETAILS SECTION -->
+        <!-- jQuery will fetch data from /api/products/:id and populate these elements -->
+        <section id="product-details-section">
+            
+            <div>
+                <!-- Main large image -->
+                <div id="main-product-image">
+                    <img id="p-main-img" src="" alt="Product Image">
+                </div>
+                
+                <!-- Thumbnails for multiple images (from product_images table) -->
+                <div id="product-thumbnails">
+                    <!-- jQuery will append thumbnail images here -->
+                    <!-- Example: <img src="path" class="thumbnail" data-img-path="path"> -->
+                </div>
+            </div>
+
+            <div>
+                <h2 id="p-name">Loading Product Name...</h2>
+                <p>Category: <span id="p-category">-</span></p>
+                <h3 id="p-price">$0.00</h3>
+                <p id="p-stock">Stock: -</p>
+                <p id="p-description">Loading description...</p>
+            </div>
+
+            <div>
+                <!-- ADD TO CART FORM -->
+                <form id="add-to-cart-form">
+                    <input type="hidden" id="p-id" value=""> <!-- jQuery will set the product ID here -->
+                    
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" name="quantity" value="1" min="1">
+                    
+                    <button type="submit">Add to Cart</button>
+                    
+                    <!-- Error message if out of stock or ajax fails -->
+                    <span id="cart-error" style="color: red;"></span>
+                    <!-- Success message -->
+                    <span id="cart-success" style="color: green;"></span>
+                </form>
+            </div>
+
+        </section>
+
+        <hr>
+
+        <!-- REVIEWS SECTION (read-only) -->
+        <section>
+            <h2>Customer Reviews</h2>
+            <div id="reviews-list-container">
+                <p id="no-reviews-message">No reviews yet.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <hr>
+
+    <footer>
+        <p>&copy; 2023 Pretty Petty. All rights reserved.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/product-details.js"></script>
+</body>
+</html>

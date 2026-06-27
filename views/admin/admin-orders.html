@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretty Petty - Admin Orders</title>
+      
+</head>
+<body>
+
+    <header>
+        <h1>Pretty Petty Admin</h1>
+        <nav>
+            <a href="/admin/dashboard.html">Dashboard</a> | 
+            <a href="/admin/products.html">Products</a> | 
+            <a href="/admin/categories.html">Categories</a> | 
+            <a href="/admin/users.html">Users</a> | 
+            <a href="/admin/orders.html">Orders</a> | 
+            <a href="/admin/reviews.html">Reviews</a> | 
+            <a href="/index.html">View Store</a> | 
+            <a href="/profile.html">Profile</a> | 
+            <a href="#" id="logout-btn">Logout</a>
+        </nav>
+        <div id="user-info" style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+            <img id="user-avatar" src="/uploads/default.png" width="30" height="30" style="border-radius: 50%;">
+            <span id="user-display-name">Admin</span>
+            <span id="user-role-badge" style="background: #007bff; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">ADMIN</span>
+        </div>
+    </header>
+
+    <hr>
+
+    <main>
+        <div id="access-denied" style="display: none; color: red; text-align: center; padding: 20px;">
+            <h2>Access Denied</h2>
+            <p>You do not have admin privileges. Only administrators can access this page.</p>
+            <a href="/login.html">Go to Login</a> | <a href="/index.html">Go to Store</a>
+        </div>
+        <div id="admin-content">
+        <h2>Manage Orders (Term Test)</h2>
+
+        <!-- General Messages -->
+        <div id="list-error" style="color: red;"></div>
+        <div id="list-success" style="color: green;"></div>
+
+        <!-- VIEW 1: ORDERS LIST TABLE -->
+        <div id="orders-list-view">
+            <table id="orders-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Customer ID</th>
+                        <th>Status</th>
+                        <th>Date Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="orders-tbody">
+                    <!-- jQuery/Datatable will populate this via GET /api/orders -->
+                    <!-- 
+                    Example row jQuery will inject:
+                    <tr>
+                        <td>#1024</td>
+                        <td>5 (John Doe)</td>
+                        <td>Pending</td>
+                        <td>2023-10-25 14:30:00</td>
+                        <td>
+                            <button class="view-order-btn" data-order-id="1024">View / Update Status</button>
+                        </td>
+                    </tr>
+                    -->
+                </tbody>
+            </table>
+        </div>
+
+        <hr>
+
+        <!-- VIEW 2: ORDER DETAILS & UPDATE STATUS (Hidden by default, shown via jQuery) -->
+        <!-- This is the core of the Term Test requirement -->
+        <div id="order-details-view" style="display: none;">
+            
+            <h3>Order Details for Order #<span id="detail-order-id">-</span></h3>
+            <p><strong>Customer ID:</strong> <span id="detail-user-id">-</span></p>
+            <p><strong>Order Date:</strong> <span id="detail-date">-</span></p>
+
+            <button type="button" id="back-to-list-btn">Back to List</button>
+
+            <br><br>
+
+            <!-- Order Items (from order_items table) -->
+            <h4>Items in this Order (For PDF Receipt)</h4>
+            <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 80%;">
+                <thead>
+                    <tr>
+                        <th>Product ID</th>
+                        <th>Unit Price</th>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                    </tr>
+                </thead>
+                <tbody id="order-items-tbody">
+                    <!-- jQuery will populate this when viewing an order -->
+                    <!-- 
+                    Example row:
+                    <tr>
+                        <td>12 (Dog Food)</td>
+                        <td>$19.99</td>
+                        <td>2</td>
+                        <td>$39.98</td>
+                    </tr>
+                    -->
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="text-align: right;"><strong>Grand Total:</strong></td>
+                        <td><strong id="detail-grand-total">$0.00</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <br>
+
+            <!-- TERM TEST TRIGGER: Update Status Form -->
+            <!-- When submitted, Node.js will handle Nodemailer + PDF attachment -->
+            <form id="update-order-form">
+                <input type="hidden" id="update-order-id" name="order_id" value="">
+                
+                <div>
+                    <label for="update-status"><strong>Update Order Status:</strong></label><br>
+                    <!-- Matches the ENUM in your database exactly -->
+                    <select id="update-status" name="status" required>
+                        <option value="Pending">Pending</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Cancelled">Cancelled</option>
+                    </select>
+                    <!-- Quiz 4 Validation Error Span -->
+                    <span class="error-text" id="update-status-error" style="color: red;"></span>
+                </div>
+                <br>
+
+                <button type="submit" id="update-status-btn">Update Status & Send Email</button>
+            </form>
+
+            <br>
+
+            <!-- Feedback specific to the update action -->
+            <div id="update-error" style="color: red;"></div>
+            <div id="update-success" style="color: green;"></div>
+
+        </div>
+
+        </div>
+
+    </main>
+
+    <hr>
+
+    <footer>
+        <p>&copy; 2023 Pretty Petty Admin Panel. All rights reserved.</p>
+    </footer>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="/js/admin-orders.js"></script>
+</body>
+</html>

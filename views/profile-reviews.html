@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretty Petty - My Reviews</title>
+     
+</head>
+<body>
+
+    <header>
+        <h1>Pretty Petty</h1>
+        <nav>
+            <a href="index.html">Home</a> | 
+            <a href="products.html">Products</a> | 
+            <a href="cart.html">Cart (<span class="cart-count">0</span>)</a> | 
+            <a href="profile-orders.html">My Orders</a> | 
+            <a href="profile-reviews.html">My Reviews</a> | 
+            <a href="profile.html">Profile</a> | 
+            <span id="nav-auth">
+                <a href="login.html">Login</a> | 
+                <a href="register.html">Register</a>
+            </span>
+            <span id="nav-user" style="display: none;">
+                <a href="#" id="logout-link">Logout</a>
+            </span>
+        </nav>
+        <div id="user-bar" style="display: none; align-items: center; gap: 10px; margin-top: 5px; font-size: 14px;">
+            <img id="user-avatar" src="/uploads/default.png" width="25" height="25" style="border-radius: 50%;">
+            <span id="user-display-name"></span>
+        </div>
+    </header>
+
+    <hr>
+
+    <div id="not-logged-in" style="display: none; text-align: center; padding: 40px;">
+        <h2>Please Log In</h2>
+        <p>You need to be logged in to view your reviews.</p>
+        <a href="login.html">Go to Login</a>
+    </div>
+
+    <main id="reviews-content">
+        <h2>My Reviews</h2>
+
+        <div id="reviews-loading">Loading reviews...</div>
+        <div id="reviews-empty" style="display: none; text-align: center; padding: 20px;">
+            <p>You haven't written any reviews yet.</p>
+            <a href="profile-orders.html">Go to My Orders to review a product</a>
+        </div>
+
+        <div id="reviews-list"></div>
+    </main>
+
+    <hr>
+
+    <footer>
+        <p>&copy; 2023 Pretty Petty. All rights reserved.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/profile-reviews.js"></script>
+</body>
+</html>

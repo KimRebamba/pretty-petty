@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretty Petty - Checkout</title>
+    <link rel="stylesheet" href="/css/customer.css">
+</head>
+<body>
+
+    <header>
+        <h1>Pretty Petty</h1>
+        <nav>
+            <a href="index.html">Home</a> | 
+            <a href="products.html">Products</a> | 
+            <a href="cart.html">Cart (<span class="cart-count">0</span>)</a> | 
+            <a href="profile-orders.html">My Orders</a> | 
+            <a href="profile-reviews.html">My Reviews</a> | 
+            <a href="profile.html">Profile</a> | 
+            <span id="nav-auth">
+                <a href="login.html">Login</a> | 
+                <a href="register.html">Register</a>
+            </span>
+            <span id="nav-user" style="display: none;">
+                <a href="#" id="logout-link">Logout</a>
+            </span>
+        </nav>
+        <div id="user-bar" style="display: none; align-items: center; gap: 10px; margin-top: 5px; font-size: 14px;">
+            <img id="user-avatar" src="/uploads/default.png" width="25" height="25" style="border-radius: 50%;">
+            <span id="user-display-name"></span>
+            <a href="#" id="logout-link" style="margin-left: 10px;">Logout</a>
+        </div>
+    </header>
+
+    <hr>
+
+    <main>
+        
+        <h2>Checkout</h2>
+
+        <!-- Delivery address lives on the users table; only collect it here if missing from profile -->
+        <section>
+            <h3>Delivery Information</h3>
+
+            <div id="delivery-address-note" style="display: none;">
+                <p>Your order will be delivered to the address saved in your profile. To change your delivery address, update it in your <a href="profile.html">profile settings</a>.</p>
+            </div>
+
+            <form id="checkout-form">
+
+                <div id="delivery-address-section" style="display: none;">
+                    <label for="delivery_address">Delivery Address:</label><br>
+                    <textarea id="delivery_address" name="delivery_address" rows="4" cols="50" placeholder="Enter your full delivery address..."></textarea>
+                    <span class="error-text" id="delivery_address-error" style="color: red;"></span>
+                </div>
+                <br>
+
+                <!-- ORDER SUMMARY (Fetched from cart_items & products tables) -->
+                <h3>Order Summary</h3>
+                <table border="1" cellpadding="10" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="checkout-items-body">
+                        <!-- jQuery will populate this by fetching /api/cart or reading local storage -->
+                        <!-- Example of what jQuery will inject:
+                        <tr class="cart-item-row" data-product-id="1" data-unit-price="19.99">
+                            <td>Dog Food Bag</td>
+                            <td>$19.99</td>
+                            <td>2</td>
+                            <td>$39.98</td>
+                        </tr>
+                        -->
+                        <tr id="empty-cart-message">
+                            <td colspan="4">Your cart is empty.</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="3" style="text-align: right;"><strong>Total:</strong></td>
+                            <td><strong id="grand-total">$0.00</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <br>
+
+                <!-- General error message (e.g., "Stock is insufficient") -->
+                <div id="checkout-error" style="color: red;"></div>
+                <!-- Success message -->
+                <div id="checkout-success" style="color: green;"></div>
+
+                <button type="submit" id="place-order-btn">Place Order</button>
+            </form>
+        </section>
+
+    </main>
+
+    <hr>
+
+    <footer>
+        <p>&copy; 2023 Pretty Petty. All rights reserved.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/checkout.js"></script>
+</body>
+</html>

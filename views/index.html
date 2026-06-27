@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretty Petty - Pet Supplies</title>
+</head>
+<body>
+
+    <header>
+        <h1>Pretty Petty</h1>
+        <nav>
+            <a href="index.html">Home</a> | 
+            <a href="products.html">Products</a> | 
+            <a href="cart.html">Cart (<span class="cart-count">0</span>)</a> | 
+            <a href="profile-orders.html">My Orders</a> | 
+            <a href="profile-reviews.html">My Reviews</a> | 
+            <a href="profile.html">Profile</a> | 
+            <span id="nav-auth">
+                <a href="login.html">Login</a> | 
+                <a href="register.html">Register</a>
+            </span>
+            <span id="nav-user" style="display: none;">
+                <a href="#" id="logout-link">Logout</a>
+            </span>
+        </nav>
+        <div id="user-bar" style="display: none; align-items: center; gap: 10px; margin-top: 5px; font-size: 14px;">
+            <img id="user-avatar" src="/uploads/default.png" width="25" height="25" style="border-radius: 50%;">
+            <span id="user-display-name"></span>
+            <a href="#" id="logout-link" style="margin-left: 10px;">Logout</a>
+        </div>
+    </header>
+
+    <hr>
+
+    <!-- Search -->
+    <div>
+        <label for="search-input">Search Products:</label>
+        <input type="text" id="search-input" name="search" placeholder="Search for pet food, toys, etc..." autocomplete="off">
+    </div>
+
+    <hr>
+
+    <main>
+        
+        <!-- HERO SECTION -->
+        <section>
+            <h2>Welcome to Pretty Petty!</h2>
+            <p>Your one-stop shop for all your pet's needs.</p>
+        </section>
+
+        <hr>
+
+        <!-- CATEGORIES SECTION (Fetched from 'categories' table) -->
+        <section>
+            <h2>Shop by Category</h2>
+            <!-- jQuery/AJAX will append category cards/links inside this container -->
+            <div id="categories-container">
+                <!-- Example of what jQuery will inject per category:
+                <div class="category-item">
+                    <img src="image_path" alt="category_name">
+                    <h3>Dog Supplies</h3>
+                </div>
+                -->
+            </div>
+        </section>
+
+        <hr>
+
+        <!-- PRODUCTS SECTION (Fetched from 'products' and 'product_images' table) -->
+        <!-- NOTE: This can also be where you implement UT2: jQuery Infinite Scroll -->
+        <section>
+            <h2>Featured Products</h2>
+            
+            <!-- jQuery/AJAX will append product cards inside this container -->
+            <div id="products-container">
+                <!-- Example of what jQuery will inject per product:
+                <div class="product-item">
+                    <img src="image_path_from_product_images" alt="product_name">
+                    <h3>Product Name</h3>
+                    <p>Price: $19.99</p>
+                    <p>Stock: 10</p>
+                    <button class="add-to-cart-btn" data-product-id="1">Add to Cart</button>
+                </div>
+                -->
+            </div>
+
+            <!-- NOTE: If you are doing UT2 Custom jQuery Pagination instead of Infinite Scroll, 
+                 put your pagination buttons here -->
+            <div id="pagination-controls">
+                <!-- Example: <button class="page-btn" data-page="1">1</button> -->
+            </div>
+        </section>
+
+    </main>
+
+    <hr>
+
+    <footer>
+        <p>&copy; 2023 Pretty Petty. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/index.js"></script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretty Petty - Admin Products</title>
+      
+</head>
+<body>
+
+    <header>
+        <h1>Pretty Petty Admin</h1>
+        <nav>
+            <a href="/admin/dashboard.html">Dashboard</a> | 
+            <a href="/admin/products.html">Products</a> | 
+            <a href="/admin/categories.html">Categories</a> | 
+            <a href="/admin/users.html">Users</a> | 
+            <a href="/admin/orders.html">Orders</a> | 
+            <a href="/admin/reviews.html">Reviews</a> | 
+            <a href="/index.html">View Store</a> | 
+            <a href="/profile.html">Profile</a> | 
+            <a href="#" id="logout-btn">Logout</a>
+        </nav>
+        <div id="user-info" style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+            <img id="user-avatar" src="/uploads/default.png" width="30" height="30" style="border-radius: 50%;">
+            <span id="user-display-name">Admin</span>
+            <span id="user-role-badge" style="background: #007bff; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">ADMIN</span>
+        </div>
+    </header>
+
+    <hr>
+
+    <main>
+        <div id="access-denied" style="display: none; color: red; text-align: center; padding: 20px;">
+            <h2>Access Denied</h2>
+            <p>You do not have admin privileges. Only administrators can access this page.</p>
+            <a href="/login.html">Go to Login</a> | <a href="/index.html">Go to Store</a>
+        </div>
+        <div id="admin-content">
+        <h2>Manage Products (MP1 / MP3)</h2>
+
+        <!-- General Form Messages -->
+        <div id="form-success" style="color: green;"></div>
+        <div id="form-error" style="color: red;"></div>
+
+        <!-- PRODUCT FORM (Create & Edit) -->
+        <!-- enctype is REQUIRED for MP3 Multiple File Uploads to work with Node.js Multer -->
+        <form id="product-form" enctype="multipart/form-data" style="margin-bottom: 30px;">
+            
+            <!-- Hidden ID field for editing existing products -->
+            <input type="hidden" id="prod-id" name="id" value="">
+
+            <div>
+                <label for="prod-name">Product Name:</label><br>
+                <input type="text" id="prod-name" name="name" required>
+                <span class="error-text" id="prod-name-error" style="color: red;"></span>
+            </div>
+            <br>
+
+            <div>
+                <label for="prod-category">Category:</label><br>
+                <!-- jQuery will fetch /api/categories to populate this dropdown -->
+                <select id="prod-category" name="category_id" required>
+                    <option value="">-- Select Category --</option>
+                    <!-- Example: <option value="1">Dog Food</option> -->
+                </select>
+                <span class="error-text" id="prod-category-error" style="color: red;"></span>
+            </div>
+            <br>
+
+            <div>
+                <label for="prod-description">Description:</label><br>
+                <textarea id="prod-description" name="description" rows="3" cols="50"></textarea>
+                <span class="error-text" id="prod-description-error" style="color: red;"></span>
+            </div>
+            <br>
+
+            <div>
+                <label for="prod-price">Price ($):</label><br>
+                <input type="number" id="prod-price" name="price" step="0.01" min="0" required>
+                <span class="error-text" id="prod-price-error" style="color: red;"></span>
+            </div>
+            <br>
+
+            <div>
+                <label for="prod-stock">Stock Quantity:</label><br>
+                <input type="number" id="prod-stock" name="stock" min="0" required>
+                <span class="error-text" id="prod-stock-error" style="color: red;"></span>
+            </div>
+            <br>
+
+            <div>
+                <label for="prod-status">Status:</label><br>
+                <select id="prod-status" name="status" required>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+                <span class="error-text" id="prod-status-error" style="color: red;"></span>
+            </div>
+            <br>
+
+            <!-- MP3 REQUIREMENT: MULTIPLE FILE UPLOADS -->
+            <!-- The 'multiple' attribute allows selecting multiple images at once -->
+            <div>
+                <label for="prod-images">Product Images (Select Multiple):</label><br>
+                <input type="file" id="prod-images" name="images" multiple accept="image/*">
+                <!-- Container to show existing images if editing a product -->
+                <div id="existing-images-container" style="margin-top: 10px;">
+                    <!-- jQuery will append <img src="..." width="50"> here when editing -->
+                </div>
+                <span class="error-text" id="prod-images-error" style="color: red;"></span>
+            </div>
+            <br>
+
+            <button type="submit" id="submit-btn">Add Product</button>
+            <button type="button" id="cancel-edit-btn" style="display: none;">Cancel Edit</button>
+
+        </form>
+
+        <hr>
+
+        <!-- MP3 REQUIREMENT: jQuery Datatable -->
+        <table id="products-table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- jQuery/Datatable AJAX will populate these rows -->
+                <!-- 
+                Example of what the AJAX response will render:
+                <tr>
+                    <td>1</td>
+                    <td><img src="path/to/image1.jpg" width="50"></td>
+                    <td>Premium Dog Food</td>
+                    <td>Dog Supplies</td>
+                    <td>$24.99</td>
+                    <td>150</td>
+                    <td>Active</td>
+                    <td>
+                        <button class="edit-btn" data-id="1">Edit</button>
+                        <button class="delete-btn" data-id="1">Delete</button>
+                    </td>
+                </tr>
+                -->
+            </tbody>
+        </table>
+        </div>
+    </main>
+
+    <hr>
+
+    <footer>
+        <p>&copy; 2023 Pretty Petty Admin Panel. All rights reserved.</p>
+    </footer>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="/js/admin-products.js"></script>
+</body>
+</html>

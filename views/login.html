@@ -1,12 +1,49 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Pretty Petty - Login</title>
+     
 </head>
 <body>
 
-    
-    <script src="../public/js/login.js"></script>
+    <nav>
+        <a href="index.html">Home</a> | 
+        <a href="products.html">Products</a>
+    </nav>
+
+    <h2>Login to Pretty Petty</h2>
+
+    <div id="login-message" style="color: orange; display: none; margin-bottom: 10px;"></div>
+    <div id="general-error" style="color: red; display: none;"></div>
+
+    <form id="login-form">
+        
+        <div>
+            <label for="email">Email:</label><br>
+            <input type="email" id="email" name="email" required>
+            <span class="error-text" id="email-error" style="color: red;"></span>
+        </div>
+        <br>
+
+        <div>
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password" required>
+            <span class="error-text" id="password-error" style="color: red;"></span>
+        </div>
+        <br>
+
+        <button type="submit">Login</button>
+
+    </form>
+
+    <p>Don't have an account? <a href="register.html">Register here</a></p>
+
+</body>
+</html>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/login.js"></script>
 </body>
 </html>

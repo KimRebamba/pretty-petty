@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pretty Petty - Write a Review</title>
+     
+</head>
+<body>
+
+    <header>
+        <h1>Pretty Petty</h1>
+        <nav>
+            <a href="index.html">Home</a> |
+            <a href="products.html">Products</a> |
+            <a href="cart.html">Cart (<span class="cart-count">0</span>)</a> |
+            <a href="profile-orders.html">My Orders</a> |
+            <a href="profile-reviews.html">My Reviews</a> |
+            <a href="profile.html">Profile</a> |
+            <span id="nav-auth">
+                <a href="login.html">Login</a> |
+                <a href="register.html">Register</a>
+            </span>
+            <span id="nav-user" style="display: none;">
+                <a href="#" id="logout-link">Logout</a>
+            </span>
+        </nav>
+        <div id="user-bar" style="display: none; align-items: center; gap: 10px; margin-top: 5px; font-size: 14px;">
+            <img id="user-avatar" src="/uploads/default.png" width="25" height="25" style="border-radius: 50%;">
+            <span id="user-display-name"></span>
+        </div>
+    </header>
+
+    <hr>
+
+    <div id="not-logged-in" style="display: none; text-align: center; padding: 40px;">
+        <h2>Please Log In</h2>
+        <p>You need to be logged in to write a review.</p>
+        <a href="login.html">Go to Login</a>
+    </div>
+
+    <main id="review-content" style="display: none; max-width: 600px; margin: 0 auto;">
+        <h2 id="review-page-title">Write a Review</h2>
+        <p id="review-product-name" style="color: #666;"></p>
+
+        <form id="review-form">
+            <input type="hidden" id="review-id">
+            <input type="hidden" id="product-id">
+
+            <div>
+                <label for="rating">Rating:</label><br>
+                <select id="rating" name="rating" required style="padding: 5px; margin: 8px 0;">
+                    <option value="">Select rating...</option>
+                    <option value="5">★★★★★ (5) - Excellent</option>
+                    <option value="4">★★★★☆ (4) - Very Good</option>
+                    <option value="3">★★★☆☆ (3) - Good</option>
+                    <option value="2">★★☆☆☆ (2) - Fair</option>
+                    <option value="1">★☆☆☆☆ (1) - Poor</option>
+                </select>
+                <span class="error-text" id="rating-error" style="color: red;"></span>
+            </div>
+
+            <div>
+                <label for="comment">Comment:</label><br>
+                <textarea id="comment" name="comment" rows="5" cols="50" required placeholder="Share your experience with this product..."></textarea>
+                <span class="error-text" id="comment-error" style="color: red;"></span>
+            </div>
+
+            <br>
+            <button type="submit" id="submit-review-btn">Submit Review</button>
+            <a href="profile-orders.html" style="margin-left: 10px;">Back to My Orders</a>
+
+            <div id="review-error" style="color: red; margin-top: 10px;"></div>
+            <div id="review-success" style="color: green; margin-top: 10px;"></div>
+        </form>
+    </main>
+
+    <div id="review-loading" style="text-align: center; padding: 40px;">Loading...</div>
+
+    <hr>
+
+    <footer>
+        <p>&copy; 2023 Pretty Petty. All rights reserved.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="/js/review.js"></script>
+</body>
+</html>

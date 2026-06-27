@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+
+# Environment secrets
+.env
+
+# Local IDE / Editor configurations (e.g., VS Code, Cursor)
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# OS generated files
+.DS_Store
+Thumbs.db
