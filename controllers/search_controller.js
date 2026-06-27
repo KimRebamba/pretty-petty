@@ -20,7 +20,6 @@ const search = async (req, res) => {
                 {
                     model: Product_Image,
                     limit: 1,
-                    where: { deletedAt: null },
                     required: false
                 },
                 {

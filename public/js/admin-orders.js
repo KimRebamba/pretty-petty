@@ -2,36 +2,50 @@ $(document).ready(function() {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    if (token && user) {
-        // Update header user info
-        const fullName = (user.first_name || '') + ' ' + (user.last_name || '');
-        $('#user-display-name').text(fullName || 'Admin');
-        if (user.image_path) {
-            $('#user-avatar').attr('src', user.image_path);
-        }
-    }
-
     if (!token || user.role !== 'admin') {
-        $('#access-denied').show();
-        $('#admin-content').hide();
-        $('#user-info').hide();
+        window.location.href = '/index.html?msg=admin_required';
         return;
     }
 
-    const API = 'http://localhost:3000';
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const msg = params.get('msg');
+        if (msg) {
+            const $banner = $('#alert-banner');
+            let text = msg.replace(/_/g, ' ');
+            $banner.text(text).show();
+            setTimeout(function() { $banner.slideUp(); }, 5000);
+            if (window.history.replaceState) {
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+        }
+    })();
 
-    PrettyPettyUI.initButtons('#logout-btn, #back-to-list-btn, #update-status-btn');
-    PrettyPettyUI.initSelectmenu('#update-status');
+    function initUserState() {
+        const u = JSON.parse(localStorage.getItem('user') || '{}');
+        const t = localStorage.getItem('token');
+        if (t && u && u.id) {
+            $('#nav-user').css('display', 'flex');
+            const fullName = (u.first_name || '') + ' ' + (u.last_name || '');
+            $('#user-display-name').text(fullName || 'Admin');
+            if (u.image_path) $('#user-avatar').attr('src', u.image_path);
+        }
+    }
+    initUserState();
 
-    $('#order-tabs').tabs({ disabled: [1] });
-
-    // Logout handler
-    $('#logout-btn').on('click', function(e) {
+    $('#logout-link').on('click', function(e) {
         e.preventDefault();
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/login.html';
     });
+
+    const API = PrettyPettyUI.apiBase;
+
+    PrettyPettyUI.initButtons('#logout-link, #back-to-list-btn, #update-status-btn');
+    PrettyPettyUI.initSelectmenu('#update-status, #filter-status, #filter-trashed');
+
+    $('#order-tabs').tabs({ disabled: [1] });
 
     let ordersTable;
 
@@ -42,21 +56,32 @@ $(document).ready(function() {
     }
 
     function loadOrders() {
+        const params = [];
+        const status = $('#filter-status').val();
+        const trashed = $('#filter-trashed').val();
+        if (status) params.push('status=' + encodeURIComponent(status));
+        if (trashed === 'true') params.push('includeDeleted=true');
+        let url = API + '/api/orders' + (params.length ? '?' + params.join('&') : '');
+
         $.ajax({
-            url: API + '/api/orders',
+            url: url,
             method: 'GET',
             headers: { Authorization: 'Bearer ' + token },
             success: function(res) {
-                // API returns a plain array directly
                 const orders = (Array.isArray(res) ? res : []).map(function(o) {
                     const customer = o.User ? o.User.first_name + ' ' + o.User.last_name : 'User #' + (o.user_id || '-');
+                    const isDeleted = !!o.deleted_at;
+                    const actions = isDeleted
+                        ? '<button class="restore-btn" data-id="' + o.id + '">Restore</button>'
+                        : '<button class="view-order-btn" data-order-id="' + o.id + '">View</button>';
                     return {
                         DT_RowId: 'row_' + o.id,
+                        DT_RowClass: isDeleted ? 'deleted-row' : '',
                         id: o.id,
                         customer: customer,
                         status: o.status,
                         date: formatDate(o.created_at),
-                        actions: '<button class="view-order-btn" data-order-id="' + o.id + '">View</button>'
+                        actions: actions
                     };
                 });
                 if (ordersTable) { ordersTable.destroy(); }
@@ -76,9 +101,30 @@ $(document).ready(function() {
         });
     }
 
-    // View order details
+    $('#filter-status, #filter-trashed').on('change', function() { loadOrders(); });
+
+    $(document).on('click', '.restore-btn', function() {
+        const id = $(this).attr('data-id');
+        PrettyPettyUI.confirm('Restore this order?', function() {
+            $.ajax({
+                url: API + '/api/orders/' + id + '/restore',
+                method: 'PUT',
+                headers: { Authorization: 'Bearer ' + token },
+                success: function() {
+                    PrettyPettyUI.flashMessage('#list-success', 'Order restored.', 'success');
+                    $('#list-error').text('');
+                    loadOrders();
+                },
+                error: function(xhr) {
+                    PrettyPettyUI.flashMessage('#list-error', xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Restore failed.', 'error');
+                    $('#list-success').text('');
+                }
+            });
+        });
+    });
+
     $(document).on('click', '.view-order-btn', function() {
-        const orderId = $(this).data('order-id');
+        const orderId = $(this).attr('data-order-id');
         $.ajax({
             url: API + '/api/orders/' + orderId,
             method: 'GET',
@@ -90,7 +136,6 @@ $(document).ready(function() {
                 $('#update-order-id').val(order.id);
                 $('#update-status').val(order.status);
 
-                // Populate items — Sequelize returns Order_Items
                 const items = order.Order_Items || [];
                 let grandTotal = 0;
                 const tbody = $('#order-items-tbody').empty();
@@ -117,11 +162,13 @@ $(document).ready(function() {
                 $('#update-success').text('');
                 $('#update-error').text('');
             },
-            error: function() { $('#list-error').text('Failed to load order details.'); }
+            error: function(xhr) {
+                const msg = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Failed to load order details.';
+                $('#list-error').text(msg);
+            }
         });
     });
 
-    // Update order status
     $('#update-order-form').on('submit', function(e) {
         e.preventDefault();
         const orderId = $('#update-order-id').val();
@@ -143,7 +190,6 @@ $(document).ready(function() {
         });
     });
 
-    // Back to list
     $('#back-to-list-btn').on('click', function() {
         $('#order-tabs').tabs('option', 'active', 0);
         $('#order-tabs').tabs('disable', 1);

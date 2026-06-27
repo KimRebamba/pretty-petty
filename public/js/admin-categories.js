@@ -2,34 +2,48 @@ $(document).ready(function() {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    if (token && user) {
-        // Update header user info
-        const fullName = (user.first_name || '') + ' ' + (user.last_name || '');
-        $('#user-display-name').text(fullName || 'Admin');
-        if (user.image_path) {
-            $('#user-avatar').attr('src', user.image_path);
-        }
-    }
-
     if (!token || user.role !== 'admin') {
-        $('#access-denied').show();
-        $('#admin-content').hide();
-        $('#user-info').hide();
+        window.location.href = '/index.html?msg=admin_required';
         return;
     }
 
-    const API = 'http://localhost:3000';
+    const params = new URLSearchParams(window.location.search);
+    const msg = params.get('msg');
+    if (msg) {
+        const $banner = $('#alert-banner');
+        let text = msg.replace(/_/g, ' ');
+        $banner.text(text).show();
+        setTimeout(function () { $banner.slideUp(); }, 5000);
+        if (window.history.replaceState) {
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    }
 
-    PrettyPettyUI.initButtons('button, input[type="submit"], #cancel-edit-btn');
-    PrettyPettyUI.initSelectmenu('#cat-status');
+    function initUserState() {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const token = localStorage.getItem('token');
+        if (token && user && user.id) {
+            $('#nav-user').css('display', 'flex');
+            const fullName = (user.first_name || '') + ' ' + (user.last_name || '');
+            $('#user-display-name').text(fullName || 'Admin');
+            if (user.image_path) $('#user-avatar').attr('src', user.image_path);
+        }
+    }
+    initUserState();
 
-    // Logout handler
-    $('#logout-btn').on('click', function(e) {
+    $('#logout-link').on('click', function(e) {
         e.preventDefault();
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/login.html';
     });
+
+    const API = PrettyPettyUI.apiBase;
+
+    PrettyPettyUI.initButtons('#logout-link');
+    PrettyPettyUI.initButtons('#submit-btn', '#cancel-edit-btn');
+    PrettyPettyUI.initButtons('button, input[type="submit"], #cancel-edit-btn');
+    PrettyPettyUI.initSelectmenu('#cat-status');
 
     let categoriesTable;
 
@@ -39,13 +53,94 @@ $(document).ready(function() {
         return date.toLocaleDateString('en-SG', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     }
 
+    function getFilterParams() {
+        const params = [];
+        const status = $('#filter-status').val();
+        const trashed = $('#filter-trashed').val();
+        if (status) params.push('status=' + encodeURIComponent(status));
+        if (trashed === 'true') params.push('includeDeleted=true');
+        return params.length ? '?' + params.join('&') : '';
+    }
+
+    $('#filter-status, #filter-trashed').on('change', function() {
+        loadCategories();
+    });
+
+    function renderCategoryActions(c) {
+        const id = c.id;
+        if (c.deleted_at) {
+            return '<button class="restore-btn" data-id="' + id + '">Restore</button>';
+        }
+        return '<button class="edit-btn" data-id="' + id + '">Edit</button> <button class="delete-btn" data-id="' + id + '">Delete</button>';
+    }
+
+    $(document).on('change', '#select-all-checkbox', function() {
+        $('.row-checkbox').prop('checked', this.checked);
+        updateBulkBar();
+    });
+
+    $(document).on('change', '.row-checkbox', function() {
+        updateBulkBar();
+        const total = $('.row-checkbox').length;
+        const checked = $('.row-checkbox:checked').length;
+        $('#select-all-checkbox').prop('checked', total > 0 && total === checked);
+    });
+
+    function updateBulkBar() {
+        const count = $('.row-checkbox:checked').length;
+        if (count > 0) {
+            $('#selected-count').text(count);
+            $('#bulk-bar').show();
+        } else {
+            $('#bulk-bar').hide();
+        }
+    }
+
+    $('#bulk-delete-btn').on('click', function() {
+        const ids = [];
+        $('.row-checkbox:checked').each(function() {
+            ids.push(parseInt($(this).data('id')));
+        });
+        if (ids.length === 0) return;
+        PrettyPettyUI.confirm('Delete ' + ids.length + ' selected item(s)?', function() {
+            $.ajax({
+                url: API + '/api/categories/bulk',
+                method: 'DELETE',
+                headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+                data: JSON.stringify({ ids: ids }),
+                success: function(res) {
+                    $('#form-success').text(res.message);
+                    $('#select-all-checkbox').prop('checked', false);
+                    loadCategories();
+                },
+                error: function(xhr) {
+                    $('#form-error').text(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Bulk delete failed.');
+                }
+            });
+        });
+    });
+
+    $(document).on('click', '.restore-btn', function() {
+        const id = $(this).data('id');
+        PrettyPettyUI.confirm('Restore this category?', function() {
+            $.ajax({
+                url: API + '/api/categories/' + id + '/restore',
+                method: 'PUT',
+                headers: { Authorization: 'Bearer ' + token },
+                success: function() { loadCategories(); },
+                error: function(xhr) {
+                    $('#form-error').text(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Restore failed.');
+                }
+            });
+        });
+    });
+
     function loadCategories() {
         $.ajax({
-            url: API + '/api/categories',
+            url: API + '/api/categories' + getFilterParams(),
             method: 'GET',
             headers: { Authorization: 'Bearer ' + token },
             success: function(res) {
-                // API returns a plain array directly
                 const cats = (Array.isArray(res) ? res : []).map(function(c) {
                     const img = c.image_path || '/uploads/no-image.jpg';
                     return {
@@ -56,7 +151,8 @@ $(document).ready(function() {
                         description: c.description || '-',
                         status: c.status,
                         createdAt: formatDate(c.created_at),
-                        actions: '<button class="edit-btn" data-id="' + c.id + '">Edit</button> <button class="delete-btn" data-id="' + c.id + '">Delete</button>'
+                        deletedAt: c.deleted_at || null,
+                        actions: renderCategoryActions(c)
                     };
                 });
                 if (categoriesTable) { categoriesTable.destroy(); }
@@ -64,8 +160,12 @@ $(document).ready(function() {
                     data: cats,
                     destroy: true,
                     columns: [
+                        { data: null, orderable: false, searchable: false, render: function(d, type, row) {
+                            const isDeleted = row.deletedAt ? true : false;
+                            return '<input type="checkbox" class="row-checkbox" data-id="' + row.id + '" data-deleted="' + isDeleted + '">';
+                        }},
                         { data: 'id' },
-                        { data: 'image', orderable: false, render: function(d) { return '<img src="' + d + '" width="50">'; } },
+                        { data: 'image', orderable: false, render: function(d) { return '<img src="' + d + '" width="40">'; } },
                         { data: 'name' },
                         { data: 'description' },
                         { data: 'status' },
@@ -161,9 +261,6 @@ $(document).ready(function() {
         }
     });
 
-    // Create / Update category — handled by jQuery Validate submitHandler
-
-    // Edit category
     $(document).on('click', '.edit-btn', function() {
         const id = $(this).data('id');
         $.ajax({
@@ -179,7 +276,6 @@ $(document).ready(function() {
                 $('#submit-btn').text('Update Category');
                 $('#cancel-edit-btn').show();
 
-                // Show current image preview — image_path is a direct field on the model
                 const imgSrc = c.image_path || '';
                 if (imgSrc) {
                     $('#current-image-preview').attr('src', imgSrc);
@@ -193,7 +289,6 @@ $(document).ready(function() {
         });
     });
 
-    // Delete category
     $(document).on('click', '.delete-btn', function() {
         const id = $(this).data('id');
         PrettyPettyUI.confirm('Are you sure you want to delete this category?', function() {
@@ -209,7 +304,6 @@ $(document).ready(function() {
         });
     });
 
-    // Cancel edit
     $('#cancel-edit-btn').on('click', function() {
         resetCategoryForm();
     });

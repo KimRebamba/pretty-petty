@@ -1,117 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pretty Petty - Checkout</title>
-    <link rel="stylesheet" href="/css/customer.css">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pretty Petty — Checkout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/customer.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
 </head>
 <body>
 
-    <header>
-        <h1>Pretty Petty</h1>
-        <nav>
-            <a href="index.html">Home</a> | 
-            <a href="products.html">Products</a> | 
-            <a href="cart.html">Cart (<span class="cart-count">0</span>)</a> | 
-            <a href="profile-orders.html">My Orders</a> | 
-            <a href="profile-reviews.html">My Reviews</a> | 
-            <a href="profile.html">Profile</a> | 
-            <span id="nav-auth">
-                <a href="login.html">Login</a> | 
-                <a href="register.html">Register</a>
-            </span>
-            <span id="nav-user" style="display: none;">
-                <a href="#" id="logout-link">Logout</a>
-            </span>
-        </nav>
-        <div id="user-bar" style="display: none; align-items: center; gap: 10px; margin-top: 5px; font-size: 14px;">
-            <img id="user-avatar" src="/uploads/default.png" width="25" height="25" style="border-radius: 50%;">
-            <span id="user-display-name"></span>
-            <a href="#" id="logout-link" style="margin-left: 10px;">Logout</a>
+  <div id="alert-banner" class="alert-banner" style="display:none;"></div>
+
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="/uploads/pretty-petty-logo-nav.png" alt="Pretty Petty" class="nav-logo">
+        <span>Pretty Petty</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html" id="nav-home-link">Home</a>
+        <a href="products.html">Products</a>
+        <a href="products.html#categories-section" id="nav-categories-link" style="display:none;">Categories</a>
+        <a href="profile-orders.html" class="nav-auth-only" style="display:none;">Orders</a>
+        <a href="profile-reviews.html" class="nav-auth-only" style="display:none;">Reviews</a>
+        <a href="cart.html" class="nav-cart-text">Cart <span class="cart-count">0</span></a>
+      </div>
+      <div class="nav-auth-links" id="nav-auth-links">
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+      </div>
+      <div class="nav-user" id="nav-user" style="display:none;">
+        <a href="profile.html" class="nav-user-link">
+          <img id="user-avatar" src="/uploads/default.png" class="nav-avatar">
+          <span id="user-display-name"></span>
+        </a>
+        <a href="#" id="logout-link">Logout</a>
+      </div>
+      <div id="user-bar" style="display:none;"></div>
+    </div>
+  </nav>
+
+  <section class="page-section">
+    <div class="section-inner">
+
+      <h2 class="section-title">Checkout</h2>
+
+      <form id="checkout-form">
+
+        <!-- Delivery Information -->
+        <p class="section-overline" style="margin-bottom:16px;">Delivery Information</p>
+
+        <div id="delivery-address-note" class="checkout-address-note" style="display:none;">
+          <p>Your order will be delivered to the address saved in your profile. To change your delivery address, update it in your <a href="profile.html">profile settings</a>.</p>
         </div>
-    </header>
 
-    <hr>
+        <div id="delivery-address-section" style="display:none; max-width:500px;">
+          <label for="delivery_address">Delivery Address</label>
+          <textarea id="delivery_address" name="delivery_address" rows="4" placeholder="Enter your full delivery address..."></textarea>
+          <span class="error-text" id="delivery_address-error"></span>
+        </div>
 
-    <main>
-        
-        <h2>Checkout</h2>
+        <div class="divider" style="margin:32px 0;"></div>
 
-        <!-- Delivery address lives on the users table; only collect it here if missing from profile -->
-        <section>
-            <h3>Delivery Information</h3>
+        <!-- ORDER SUMMARY -->
+        <p class="section-overline" style="margin-bottom:16px;">Order Summary</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="checkout-items-body">
+            <tr id="empty-cart-message"><td colspan="4" class="empty-state"><p>Your cart is empty.</p></td></tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" style="text-align:right;">Total:</td>
+              <td><strong id="grand-total">$0.00</strong></td>
+            </tr>
+          </tfoot>
+        </table>
 
-            <div id="delivery-address-note" style="display: none;">
-                <p>Your order will be delivered to the address saved in your profile. To change your delivery address, update it in your <a href="profile.html">profile settings</a>.</p>
-            </div>
+        <div id="checkout-error" class="text-error" style="margin-top:16px;"></div>
+        <div id="checkout-success" class="text-success" style="margin-top:16px;"></div>
 
-            <form id="checkout-form">
+        <button type="submit" id="place-order-btn">Place Order</button>
 
-                <div id="delivery-address-section" style="display: none;">
-                    <label for="delivery_address">Delivery Address:</label><br>
-                    <textarea id="delivery_address" name="delivery_address" rows="4" cols="50" placeholder="Enter your full delivery address..."></textarea>
-                    <span class="error-text" id="delivery_address-error" style="color: red;"></span>
-                </div>
-                <br>
+      </form>
 
-                <!-- ORDER SUMMARY (Fetched from cart_items & products tables) -->
-                <h3>Order Summary</h3>
-                <table border="1" cellpadding="10" cellspacing="0" style="border-collapse: collapse; width: 100%;">
-                    <thead>
-                        <tr>
-                            <th>Product</th>
-                            <th>Price</th>
-                            <th>Quantity</th>
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody id="checkout-items-body">
-                        <!-- jQuery will populate this by fetching /api/cart or reading local storage -->
-                        <!-- Example of what jQuery will inject:
-                        <tr class="cart-item-row" data-product-id="1" data-unit-price="19.99">
-                            <td>Dog Food Bag</td>
-                            <td>$19.99</td>
-                            <td>2</td>
-                            <td>$39.98</td>
-                        </tr>
-                        -->
-                        <tr id="empty-cart-message">
-                            <td colspan="4">Your cart is empty.</td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="3" style="text-align: right;"><strong>Total:</strong></td>
-                            <td><strong id="grand-total">$0.00</strong></td>
-                        </tr>
-                    </tfoot>
-                </table>
+    </div>
+  </section>
 
-                <br>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <img src="/uploads/pretty-petty-logo.png" alt="Pretty Petty">
+            <span>Pretty Petty</span>
+          </div>
+          <p class="footer-tagline">Thoughtful essentials for the animals you love.</p>
+        </div>
+        <div class="footer-col">
+          <p class="footer-col-title">Shop</p>
+          <ul>
+            <li><a href="products.html">All Products</a></li>
+            <li><a href="cart.html">Cart</a></li>
+            <li><a href="profile-orders.html">My Orders</a></li>
+            <li><a href="profile-reviews.html">My Reviews</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <p class="footer-col-title">Account</p>
+          <ul>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Pretty Petty. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
-                <!-- General error message (e.g., "Stock is insufficient") -->
-                <div id="checkout-error" style="color: red;"></div>
-                <!-- Success message -->
-                <div id="checkout-success" style="color: green;"></div>
-
-                <button type="submit" id="place-order-btn">Place Order</button>
-            </form>
-        </section>
-
-    </main>
-
-    <hr>
-
-    <footer>
-        <p>&copy; 2023 Pretty Petty. All rights reserved.</p>
-    </footer>
-
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
-    <script src="/js/ui-common.js"></script>
-    <script src="/js/checkout.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
+  <script src="/js/ui-common.js"></script>
+  <script src="/js/checkout.js"></script>
 </body>
 </html>

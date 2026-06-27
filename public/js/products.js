@@ -7,22 +7,45 @@ $(document).ready(function () {
     PrettyPettyUI.initButtons('button');
     PrettyPettyUI.initProductSearchAutocomplete();
 
-    // ── User bar ──
-    function initUserBar() {
+    // ── Alert banner ──
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const msg = params.get('msg');
+        if (msg) {
+            const $b = $('#alert-banner');
+            let text = '';
+            if (msg === 'login_required') text = 'You need to be logged in to access that page. <a href="login.html">Log in</a> or <a href="register.html">create an account</a>.';
+            else if (msg === 'admin_required') text = 'You do not have permission to access that page.';
+            else if (msg === 'access_denied') text = 'Access denied.';
+            else text = msg;
+            $b.html(text).slideDown(200);
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    })();
+
+    // ── User state ──
+    function initUserState() {
         const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if (token && user && user.id) {
-            $('#nav-auth').hide();
-            $('#nav-user').css('display', 'inline');
+        const t = localStorage.getItem('token');
+        if (t && user && user.id) {
+            $('#nav-auth-links').hide();
+            $('#nav-user').css('display', 'flex');
+            $('.nav-auth-only').show();
+            $('#nav-categories-link').hide();
             const fullName = (user.first_name || '') + ' ' + (user.last_name || '');
-            $('#user-display-name').text('Hi, ' + fullName);
+            $('#user-display-name').text(fullName);
             if (user.image_path) $('#user-avatar').attr('src', user.image_path);
-            $('#user-bar').css('display', 'flex');
             if (user.role === 'admin') {
-                $('#user-bar').append('<a href="/admin/dashboard.html" style="margin-left: 10px;">Admin Panel</a>');
+                $('#nav-home-link').attr('href', '/admin/dashboard.html').text('Admin');
             }
+        } else {
+            $('#nav-auth-links').show();
+            $('#nav-user').hide();
+            $('.nav-auth-only').hide();
+            $('#nav-categories-link').show();
         }
     }
-    initUserBar();
+    initUserState();
 
     // ── Cart count ──
     function loadCartCount() {
@@ -55,7 +78,7 @@ $(document).ready(function () {
         }
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/login.html';
+        window.location.href = '/index.html?msg=login_required';
     });
 
     // ── State ──

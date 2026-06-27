@@ -1,121 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pretty Petty - Shopping Cart</title>
-     
-    <link rel="stylesheet" href="/css/customer.css">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pretty Petty — Cart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/customer.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
 </head>
 <body>
 
-    <header>
-        <h1>Pretty Petty</h1>
-        <nav>
-            <a href="index.html">Home</a> | 
-            <a href="products.html">Products</a> | 
-            <a href="cart.html">Cart (<span class="cart-count">0</span>)</a> | 
-            <a href="profile-orders.html">My Orders</a> | 
-            <a href="profile-reviews.html">My Reviews</a> | 
-            <a href="profile.html">Profile</a> | 
-            <span id="nav-auth">
-                <a href="login.html">Login</a> | 
-                <a href="register.html">Register</a>
-            </span>
-            <span id="nav-user" style="display: none;">
-                <a href="#" id="logout-link">Logout</a>
-            </span>
-        </nav>
-        <div id="user-bar" style="display: none; align-items: center; gap: 10px; margin-top: 5px; font-size: 14px;">
-            <img id="user-avatar" src="/uploads/default.png" width="25" height="25" style="border-radius: 50%;">
-            <span id="user-display-name"></span>
-            <a href="#" id="logout-link" style="margin-left: 10px;">Logout</a>
-        </div>
-    </header>
+  <div id="alert-banner" class="alert-banner" style="display:none;"></div>
 
-    <hr>
-
-    <!-- QUIZ 5 REQUIREMENT: Search / Autocomplete -->
-    <div>
-        <label for="search-input">Search Products:</label>
-        <input type="text" id="search-input" name="search" placeholder="Search for pet food, toys, etc..." autocomplete="off">
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="/uploads/pretty-petty-logo-nav.png" alt="Pretty Petty" class="nav-logo">
+        <span>Pretty Petty</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html" id="nav-home-link">Home</a>
+        <a href="products.html">Products</a>
+        <a href="products.html#categories-section" id="nav-categories-link" style="display:none;">Categories</a>
+        <a href="profile-orders.html" class="nav-auth-only" style="display:none;">Orders</a>
+        <a href="profile-reviews.html" class="nav-auth-only" style="display:none;">Reviews</a>
+        <a href="cart.html" class="nav-cart-text">Cart <span class="cart-count">0</span></a>
+      </div>
+      <div class="nav-auth-links" id="nav-auth-links">
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+      </div>
+      <div class="nav-user" id="nav-user" style="display:none;">
+        <a href="profile.html" class="nav-user-link">
+          <img id="user-avatar" src="/uploads/default.png" class="nav-avatar">
+          <span id="user-display-name"></span>
+        </a>
+        <a href="#" id="logout-link">Logout</a>
+      </div>
+      <div id="user-bar" style="display:none;"></div>
     </div>
+  </nav>
 
-    <hr>
+  <section class="page-section">
+    <div class="section-inner">
 
-    <main>
-        
-        <h2>Shopping Cart</h2>
+      <h2 class="section-title">Shopping Cart</h2>
 
-        <!-- General error message (e.g., "Failed to update quantity" or "Item out of stock") -->
-        <div id="cart-error" style="color: red;"></div>
-        <!-- General success message (e.g., "Cart updated") -->
-        <div id="cart-success" style="color: green;"></div>
+      <!-- Error / success messages -->
+      <div id="cart-error" class="text-error" style="margin-bottom:12px;"></div>
+      <div id="cart-success" class="text-success" style="margin-bottom:12px;"></div>
 
-        <!-- EMPTY CART STATE -->
-        <div id="empty-cart-message" style="display: none;">
-            <p>Your cart is currently empty.</p>
-            <a href="products.html">Browse Products</a>
+      <!-- EMPTY CART STATE -->
+      <div id="empty-cart-message" class="empty-state" style="display:none;">
+        <p>Your cart is currently empty.</p>
+        <a href="products.html">Browse Products</a>
+      </div>
+
+      <!-- CART TABLE -->
+      <div id="cart-table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Quantity</th>
+              <th>Subtotal</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="cart-items-body"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3" style="text-align:right;">Grand Total:</td>
+              <td colspan="2"><strong id="grand-total">$0.00</strong></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <div class="cart-actions">
+          <a href="products.html">Continue Shopping</a>
+          <a href="checkout.html" id="proceed-to-checkout-btn">Proceed to Checkout</a>
         </div>
+      </div>
 
-        <!-- CART TABLE (Only shown if cart has items) -->
-        <div id="cart-table-container">
-            <table border="1" cellpadding="10" cellspacing="0" style="border-collapse: collapse; width: 100%;">
-                <thead>
-                    <tr>
-                        <th>Product</th>
-                        <th>Price</th>
-                        <th>Quantity</th>
-                        <th>Subtotal</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="cart-items-body">
-                    <!-- jQuery will populate this by fetching /api/cart -->
-                    <!-- 
-                    Example of what jQuery will inject per row:
-                    <tr class="cart-row" data-cart-item-id="12" data-product-id="5">
-                        <td>Dog Food Bag</td>
-                        <td class="item-price" data-price="19.99">$19.99</td>
-                        <td>
-                            <input type="number" class="quantity-input" value="2" min="1" style="width: 50px;">
-                            <button class="update-qty-btn">Update</button>
-                            <span class="error-text qty-error" style="color: red;"></span>
-                        </td>
-                        <td class="item-subtotal">$39.98</td>
-                        <td><button class="remove-item-btn">Remove</button></td>
-                    </tr>
-                    -->
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="3" style="text-align: right;"><strong>Grand Total:</strong></td>
-                        <td colspan="2"><strong id="grand-total">$0.00</strong></td>
-                    </tr>
-                </tfoot>
-            </table>
+    </div>
+  </section>
 
-            <br>
-
-            <div>
-                <a href="products.html">Continue Shopping</a> | 
-                <a href="checkout.html" id="proceed-to-checkout-btn">Proceed to Checkout</a>
-            </div>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <img src="/uploads/pretty-petty-logo.png" alt="Pretty Petty">
+            <span>Pretty Petty</span>
+          </div>
+          <p class="footer-tagline">Thoughtful essentials for the animals you love.</p>
         </div>
+        <div class="footer-col">
+          <p class="footer-col-title">Shop</p>
+          <ul>
+            <li><a href="products.html">All Products</a></li>
+            <li><a href="cart.html">Cart</a></li>
+            <li><a href="profile-orders.html">My Orders</a></li>
+            <li><a href="profile-reviews.html">My Reviews</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <p class="footer-col-title">Account</p>
+          <ul>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Pretty Petty. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
-    </main>
-
-    <hr>
-
-    <footer>
-        <p>&copy; 2023 Pretty Petty. All rights reserved.</p>
-    </footer>
-
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
-    <script src="/js/ui-common.js"></script>
-    <script src="/js/cart.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
+  <script src="/js/ui-common.js"></script>
+  <script src="/js/cart.js"></script>
 </body>
 </html>

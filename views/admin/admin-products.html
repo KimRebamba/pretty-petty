@@ -1,167 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pretty Petty - Admin Products</title>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pretty Petty Admin — Products</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
 </head>
 <body>
 
-    <header>
-        <h1>Pretty Petty Admin</h1>
-        <nav>
-            <a href="/admin/dashboard.html">Dashboard</a> | 
-            <a href="/admin/products.html">Products</a> | 
-            <a href="/admin/categories.html">Categories</a> | 
-            <a href="/admin/users.html">Users</a> | 
-            <a href="/admin/orders.html">Orders</a> | 
-            <a href="/admin/reviews.html">Reviews</a> | 
-            <a href="/index.html">View Store</a> | 
-            <a href="/profile.html">Profile</a> | 
-            <a href="#" id="logout-btn">Logout</a>
-        </nav>
-        <div id="user-info" style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
-            <img id="user-avatar" src="/uploads/default.png" width="30" height="30" style="border-radius: 50%;">
-            <span id="user-display-name">Admin</span>
-            <span id="user-role-badge" style="background: #007bff; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">ADMIN</span>
+  <!-- ── NAV ── -->
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="/admin/dashboard.html" class="nav-brand">
+        <img src="/uploads/pretty-petty-logo-nav.png" alt="Pretty Petty" class="nav-logo">
+         <span>Pretty Petty <small class="nav-admin-badge">Admin</small></span>
+      </a>
+      <div class="nav-links">
+         <a href="/index.html" id="nav-home-link">Store</a>
+        <a href="/admin/dashboard.html">Dashboard</a>
+        <a href="/admin/products.html" class="active">Products</a>
+        <a href="/admin/categories.html">Categories</a>
+        <a href="/admin/users.html">Users</a>
+        <a href="/admin/orders.html">Orders</a>
+        <a href="/admin/reviews.html">Reviews</a>
+       
+      </div>
+      <div class="nav-user" id="nav-user" style="display:none;">
+        <a href="/profile.html" class="nav-user-link">
+          <img id="user-avatar" src="/uploads/default.png" class="nav-avatar">
+          <span id="user-display-name"></span>
+        </a>
+        <a href="#" id="logout-link">Logout</a>
+      </div>
+      <div id="user-bar" style="display:none;"></div>
+    </div>
+  </nav>
+
+  <div id="alert-banner" class="alert-banner" style="display:none;"></div>
+
+  <!-- ── MAIN CONTENT ── -->
+  <section class="admin-section" style="padding-bottom: 0px;">
+    <div class="admin-inner">
+      <p class="admin-overline">Inventory</p>
+      <h2 class="admin-title">Manage Products</h2>
+
+      <div id="form-success"></div>
+      <div id="form-error"></div>
+
+      <div class="admin-filter-bar">
+        <div class="admin-filter-group">
+          <label>Status</label>
+          <select id="filter-status" class="admin-filter-select">
+            <option value="">All</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
         </div>
-    </header>
-
-    <hr>
-
-    <main>
-        <div id="access-denied" style="display: none; color: red; text-align: center; padding: 20px;">
-            <h2>Access Denied</h2>
-            <p>You do not have admin privileges. Only administrators can access this page.</p>
-            <a href="/login.html">Go to Login</a> | <a href="/index.html">Go to Store</a>
+        <div class="admin-filter-group">
+          <label>Trashed</label>
+          <select id="filter-trashed" class="admin-filter-select">
+            <option value="false">Only Active</option>
+            <option value="true">Include Trashed</option>
+          </select>
         </div>
-        <div id="admin-content">
-        <h2>Manage Products (MP1 / MP3)</h2>
+      </div>
 
-        <!-- General Form Messages -->
-        <div id="form-success" style="color: green;"></div>
-        <div id="form-error" style="color: red;"></div>
+      <!-- Products Table -->
+      <table id="products-table" style="width:100%;">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="select-all-checkbox"></th>
+            <th>ID</th>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
 
-        <!-- PRODUCT FORM (Create & Edit) -->
-        <!-- enctype is REQUIRED for MP3 Multiple File Uploads to work with Node.js Multer -->
-        <form id="product-form" enctype="multipart/form-data" novalidate style="margin-bottom: 30px;">
-            
-            <!-- Hidden ID field for editing existing products -->
-            <input type="hidden" id="prod-id" name="id" value="">
+      <div class="admin-bulk-bar" id="bulk-bar" style="display:none;">
+        <span class="admin-bulk-count"><span id="selected-count">0</span> selected</span>
+        <button id="bulk-delete-btn" class="admin-btn-danger">Delete Selected</button>
+      </div>
 
-            <div>
-                <label for="prod-name">Product Name:</label><br>
-                <input type="text" id="prod-name" name="name">
-                <span class="error-text" id="prod-name-error" style="color: red;"></span>
-            </div>
-            <br>
+      <div class="admin-divider" style="margin:32px auto;"></div>
 
-            <div>
-                <label for="prod-category">Category:</label><br>
-                <!-- jQuery will fetch /api/categories to populate this dropdown -->
-                <select id="prod-category" name="category_id">
-                    <option value="">-- Select Category --</option>
-                    <!-- Example: <option value="1">Dog Food</option> -->
-                </select>
-                <span class="error-text" id="prod-category-error" style="color: red;"></span>
-            </div>
-            <br>
+    <p class="admin-overline">Add & Edit Inventory</p>
+      <h2 class="admin-title">Product Form</h2>
 
-            <div>
-                <label for="prod-description">Description:</label><br>
-                <textarea id="prod-description" name="description" rows="3" cols="50"></textarea>
-                <span class="error-text" id="prod-description-error" style="color: red;"></span>
-            </div>
-            <br>
+       <!-- Product Form -->
+      <div class="admin-form-card" style="margin-bottom: 0px;">
+        <form id="product-form" enctype="multipart/form-data" novalidate>
+          <input type="hidden" id="prod-id" name="id" value="">
 
-            <div>
-                <label for="prod-price">Price ($):</label><br>
-                <input type="number" id="prod-price" name="price" step="0.01" min="0">
-                <span class="error-text" id="prod-price-error" style="color: red;"></span>
-            </div>
-            <br>
+          <label for="prod-name">Product Name</label>
+          <input type="text" id="prod-name" name="name">
+          <span class="error-text" id="prod-name-error"></span>
 
-            <div>
-                <label for="prod-stock">Stock Quantity:</label><br>
-                <input type="number" id="prod-stock" name="stock" min="0">
-                <span class="error-text" id="prod-stock-error" style="color: red;"></span>
-            </div>
-            <br>
+          <label for="prod-category">Category</label>
+          <select id="prod-category" name="category_id">
+            <option value="">-- Select Category --</option>
+          </select>
+          <span class="error-text" id="prod-category-error"></span>
 
-            <div>
-                <label for="prod-status">Status:</label><br>
-                <select id="prod-status" name="status">
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                </select>
-                <span class="error-text" id="prod-status-error" style="color: red;"></span>
-            </div>
-            <br>
+          <label for="prod-description" style="padding-top: 20px;">Description</label>
+          <textarea id="prod-description" name="description" rows="3"></textarea>
+          <span class="error-text" id="prod-description-error"></span>
 
-            <!-- MP3 REQUIREMENT: MULTIPLE FILE UPLOADS -->
-            <!-- The 'multiple' attribute allows selecting multiple images at once -->
-            <div>
-                <label for="prod-images">Product Images (Select Multiple):</label><br>
-                <input type="file" id="prod-images" name="images" multiple accept="image/*">
-                <!-- Container to show existing images if editing a product -->
-                <div id="existing-images-container" style="margin-top: 10px;">
-                    <!-- jQuery will append <img src="..." width="50"> here when editing -->
-                </div>
-                <span class="error-text" id="prod-images-error" style="color: red;"></span>
-            </div>
-            <br>
+          <label for="prod-price">Price ($)</label>
+          <input type="number" id="prod-price" name="price" step="0.01" min="0">
+          <span class="error-text" id="prod-price-error"></span>
+
+          <label for="prod-stock">Stock Quantity</label>
+          <input type="number" id="prod-stock" name="stock" min="0">
+          <span class="error-text" id="prod-stock-error"></span>
+
+          <label for="prod-status">Status</label>
+          <select id="prod-status" name="status">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <span class="error-text" id="prod-status-error"></span>
+
+          <label for="prod-images" style="padding-top: 20px;">Product Images (Select Multiple)</label>
+          <input type="file" id="prod-images" name="images" multiple accept="image/*">
+          <div id="existing-images-container"></div>
+          <span class="error-text" id="prod-images-error"></span>
+
+          <div style="display:flex;gap:12px;margin-top:8px; padding-top: 20px;">
 
             <button type="submit" id="submit-btn">Add Product</button>
-            <button type="button" id="cancel-edit-btn" style="display: none;">Cancel Edit</button>
-
+            <button type="button" id="cancel-edit-btn" style="display:none;">Cancel Edit</button>
+          </div>
         </form>
+      </div>
+    </div>
 
-        <hr>
+    
+  </section>
 
-        <!-- MP3 REQUIREMENT: jQuery Datatable -->
-        <table id="products-table" style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Category</th>
-                    <th>Price</th>
-                    <th>Stock</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- jQuery/Datatable AJAX will populate these rows -->
-                <!-- 
-                Example of what the AJAX response will render:
-                <tr>
-                    <td>1</td>
-                    <td><img src="path/to/image1.jpg" width="50"></td>
-                    <td>Premium Dog Food</td>
-                    <td>Dog Supplies</td>
-                    <td>$24.99</td>
-                    <td>150</td>
-                    <td>Active</td>
-                    <td>
-                        <button class="edit-btn" data-id="1">Edit</button>
-                        <button class="delete-btn" data-id="1">Delete</button>
-                    </td>
-                </tr>
-                -->
-            </tbody>
-        </table>
-        </div>
-    </main>
-
-    <hr>
-
-    <footer>
-        <p>&copy; 2023 Pretty Petty Admin Panel. All rights reserved.</p>
-    </footer>
+  <!-- ── FOOTER ── -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-bottom">
+        <p style="font-size:11px;color:#aaa;">&copy; 2025 Pretty Petty Admin. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>

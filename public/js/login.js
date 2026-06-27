@@ -1,6 +1,22 @@
 $(document).ready(function () {
     const API = 'http://localhost:3000';
 
+    // ── Alert banner ──
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const msg = params.get('msg');
+        if (msg) {
+            const $b = $('#alert-banner');
+            let text = '';
+            if (msg === 'login_required') text = 'You need to be logged in to access that page. <a href="login.html">Log in</a> or <a href="register.html">create an account</a>.';
+            else if (msg === 'admin_required') text = 'You do not have permission to access that page. Admin access required.';
+            else if (msg === 'access_denied') text = 'Access denied.';
+            else text = msg;
+            $b.html(text).slideDown(200);
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    })();
+
     PrettyPettyUI.initButtons('button, input[type="submit"]');
 
     // Check URL params for messages (e.g., ?msg=access_denied)

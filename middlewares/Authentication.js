@@ -24,8 +24,14 @@ const authenticate = async (req, res, next) => {
 
         const user = await User.findByPk(decoded.id);
 
-        if (!user) {
-            return res.status(401).json({ message: 'User not found' });
+        // Check if user still exists and is active
+        if (!user || user.status !== 'active') {
+            return res.status(401).json({ message: 'Account is inactive or does not exist' });
+        }
+
+        // Refresh role from DB (prevents stale admin token)
+        if (user.role !== decoded.role) {
+            return res.status(403).json({ message: 'Role changed. Please log in again.' });
         }
 
         req.user = user;

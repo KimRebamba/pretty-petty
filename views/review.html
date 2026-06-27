@@ -1,94 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pretty Petty - Write a Review</title>
-     
-    <link rel="stylesheet" href="/css/customer.css">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pretty Petty — Write a Review</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/customer.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
 </head>
 <body>
 
-    <header>
-        <h1>Pretty Petty</h1>
-        <nav>
-            <a href="index.html">Home</a> |
-            <a href="products.html">Products</a> |
-            <a href="cart.html">Cart (<span class="cart-count">0</span>)</a> |
-            <a href="profile-orders.html">My Orders</a> |
-            <a href="profile-reviews.html">My Reviews</a> |
-            <a href="profile.html">Profile</a> |
-            <span id="nav-auth">
-                <a href="login.html">Login</a> |
-                <a href="register.html">Register</a>
-            </span>
-            <span id="nav-user" style="display: none;">
-                <a href="#" id="logout-link">Logout</a>
-            </span>
-        </nav>
-        <div id="user-bar" style="display: none; align-items: center; gap: 10px; margin-top: 5px; font-size: 14px;">
-            <img id="user-avatar" src="/uploads/default.png" width="25" height="25" style="border-radius: 50%;">
-            <span id="user-display-name"></span>
-        </div>
-    </header>
+  <div id="alert-banner" class="alert-banner" style="display:none;"></div>
 
-    <hr>
-
-    <div id="not-logged-in" style="display: none; text-align: center; padding: 40px;">
-        <h2>Please Log In</h2>
-        <p>You need to be logged in to write a review.</p>
-        <a href="login.html">Go to Login</a>
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="/uploads/pretty-petty-logo-nav.png" alt="Pretty Petty" class="nav-logo">
+        <span>Pretty Petty</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html" id="nav-home-link">Home</a>
+        <a href="products.html">Products</a>
+        <a href="products.html#categories-section" id="nav-categories-link" style="display:none;">Categories</a>
+        <a href="profile-orders.html" class="nav-auth-only" style="display:none;">Orders</a>
+        <a href="profile-reviews.html" class="nav-auth-only" style="display:none;">Reviews</a>
+        <a href="cart.html" class="nav-cart-text">Cart <span class="cart-count">0</span></a>
+      </div>
+      <div class="nav-auth-links" id="nav-auth-links">
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+      </div>
+      <div class="nav-user" id="nav-user" style="display:none;">
+        <a href="profile.html" class="nav-user-link">
+          <img id="user-avatar" src="/uploads/default.png" class="nav-avatar">
+          <span id="user-display-name"></span>
+        </a>
+        <a href="#" id="logout-link">Logout</a>
+      </div>
+      <div id="user-bar" style="display:none;"></div>
     </div>
+  </nav>
 
-    <main id="review-content" style="display: none; max-width: 600px; margin: 0 auto;">
-        <h2 id="review-page-title">Write a Review</h2>
-        <p id="review-product-name" style="color: #666;"></p>
+  <section class="page-section">
+    <div class="section-inner">
+
+      <div id="review-loading" style="text-align:center; padding:40px;"><p style="font-size:12px; color:#888;">Loading...</p></div>
+
+      <div id="review-content" class="form-card" style="display:none;">
+        <h2 class="page-title" id="review-page-title">Write a Review</h2>
+        <p class="page-subtitle" id="review-product-name"></p>
 
         <form id="review-form">
-            <input type="hidden" id="review-id">
-            <input type="hidden" id="product-id">
+          <input type="hidden" id="review-id">
+          <input type="hidden" id="product-id">
 
-            <div>
-                <label for="rating">Rating:</label><br>
-                <select id="rating" name="rating" required style="padding: 5px; margin: 8px 0;">
-                    <option value="">Select rating...</option>
-                    <option value="5">★★★★★ (5) - Excellent</option>
-                    <option value="4">★★★★☆ (4) - Very Good</option>
-                    <option value="3">★★★☆☆ (3) - Good</option>
-                    <option value="2">★★☆☆☆ (2) - Fair</option>
-                    <option value="1">★☆☆☆☆ (1) - Poor</option>
-                </select>
-                <span class="error-text" id="rating-error" style="color: red;"></span>
-            </div>
+          <div style="margin-bottom:16px;">
+            <label for="rating">Rating</label>
+            <select id="rating" name="rating" required>
+              <option value="">Select rating...</option>
+              <option value="5">★★★★★ (5) — Excellent</option>
+              <option value="4">★★★★☆ (4) — Very Good</option>
+              <option value="3">★★★☆☆ (3) — Good</option>
+              <option value="2">★★☆☆☆ (2) — Fair</option>
+              <option value="1">★☆☆☆☆ (1) — Poor</option>
+            </select>
+            <span class="error-text" id="rating-error"></span>
+          </div>
 
-            <div>
-                <label for="comment">Comment:</label><br>
-                <textarea id="comment" name="comment" rows="5" cols="50" required placeholder="Share your experience with this product..."></textarea>
-                <span class="error-text" id="comment-error" style="color: red;"></span>
-            </div>
+          <div style="margin-bottom:16px;">
+            <label for="comment">Comment</label>
+            <textarea id="comment" name="comment" rows="5" required placeholder="Share your experience with this product..."></textarea>
+            <span class="error-text" id="comment-error"></span>
+          </div>
 
-            <br>
+          <div style="display:flex; align-items:center; gap:16px;">
             <button type="submit" id="submit-review-btn">Submit Review</button>
-            <a href="profile-orders.html" style="margin-left: 10px;">Back to My Orders</a>
+            <a href="profile-orders.html" class="hero-link" style="font-size:11px; letter-spacing:0.08em; text-transform:uppercase;">Back to My Orders</a>
+          </div>
 
-            <div id="review-error" style="color: red; margin-top: 10px;"></div>
-            <div id="review-success" style="color: green; margin-top: 10px;"></div>
+          <div id="review-error" class="text-error" style="margin-top:12px;"></div>
+          <div id="review-success" class="text-success" style="margin-top:12px;"></div>
         </form>
-    </main>
+      </div>
 
-    <div id="review-loading" style="text-align: center; padding: 40px;">Loading...</div>
+    </div>
+  </section>
 
-    <hr>
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <img src="/uploads/pretty-petty-logo.png" alt="Pretty Petty">
+            <span>Pretty Petty</span>
+          </div>
+          <p class="footer-tagline">Thoughtful essentials for the animals you love.</p>
+        </div>
+        <div class="footer-col">
+          <p class="footer-col-title">Shop</p>
+          <ul>
+            <li><a href="products.html">All Products</a></li>
+            <li><a href="cart.html">Cart</a></li>
+            <li><a href="profile-orders.html">My Orders</a></li>
+            <li><a href="profile-reviews.html">My Reviews</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <p class="footer-col-title">Account</p>
+          <ul>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Pretty Petty. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
-    <footer>
-        <p>&copy; 2023 Pretty Petty. All rights reserved.</p>
-    </footer>
-
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
-    <script src="/js/ui-common.js"></script>
-    <script src="/js/review.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
+  <script src="/js/ui-common.js"></script>
+  <script src="/js/review.js"></script>
 </body>
 </html>

@@ -13,18 +13,49 @@ $(document).ready(function () {
         $('#not-logged-in').show();
         return;
     }
-
+     PrettyPettyUI.initButtons('#logout-link');
     PrettyPettyUI.initButtons('button, input[type="submit"]');
     PrettyPettyUI.initSelectmenu('#rating');
 
-    // User bar
-    if (user.first_name || user.last_name) {
-        $('#user-display-name').text('Hi, ' + (user.first_name || '') + ' ' + (user.last_name || ''));
+    // ── Alert banner ──
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const msg = params.get('msg');
+        if (msg) {
+            const $b = $('#alert-banner');
+            let text = '';
+            if (msg === 'login_required') text = 'You need to be logged in to access that page. <a href="login.html">Log in</a> or <a href="register.html">create an account</a>.';
+            else if (msg === 'admin_required') text = 'You do not have permission to access that page.';
+            else if (msg === 'access_denied') text = 'Access denied.';
+            else text = msg;
+            $b.html(text).slideDown(200);
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    })();
+
+    // ── User state ──
+    function initUserState() {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const t = localStorage.getItem('token');
+        if (t && user && user.id) {
+            $('#nav-auth-links').hide();
+            $('#nav-user').css('display', 'flex');
+            $('.nav-auth-only').show();
+            $('#nav-categories-link').hide();
+            const fullName = (user.first_name || '') + ' ' + (user.last_name || '');
+            $('#user-display-name').text(fullName);
+            if (user.image_path) $('#user-avatar').attr('src', user.image_path);
+            if (user.role === 'admin') {
+                $('#nav-home-link').attr('href', '/admin/dashboard.html').text('Admin');
+            }
+        } else {
+            $('#nav-auth-links').show();
+            $('#nav-user').hide();
+            $('.nav-auth-only').hide();
+            $('#nav-categories-link').show();
+        }
     }
-    if (user.image_path) $('#user-avatar').attr('src', user.image_path);
-    $('#user-bar').css('display', 'flex');
-    $('#nav-auth').hide();
-    $('#nav-user').css('display', 'inline');
+    initUserState();
 
     function loadCartCount() {
         $.ajax({
@@ -49,7 +80,7 @@ $(document).ready(function () {
         }
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/login.html';
+        window.location.href = '/index.html?msg=login_required';
     });
 
     function showForm() {

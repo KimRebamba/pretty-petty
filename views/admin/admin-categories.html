@@ -1,140 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pretty Petty - Admin Categories</title>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pretty Petty Admin — Categories</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
 </head>
 <body>
 
-    <header>
-        <h1>Pretty Petty Admin</h1>
-        <nav>
-            <a href="/admin/dashboard.html">Dashboard</a> | 
-            <a href="/admin/products.html">Products</a> | 
-            <a href="/admin/categories.html">Categories</a> | 
-            <a href="/admin/users.html">Users</a> | 
-            <a href="/admin/orders.html">Orders</a> | 
-            <a href="/admin/reviews.html">Reviews</a> | 
-            <a href="/index.html">View Store</a> | 
-            <a href="/profile.html">Profile</a> | 
-            <a href="#" id="logout-btn">Logout</a>
-        </nav>
-        <div id="user-info" style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
-            <img id="user-avatar" src="/uploads/default.png" width="30" height="30" style="border-radius: 50%;">
-            <span id="user-display-name">Admin</span>
-            <span id="user-role-badge" style="background: #007bff; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">ADMIN</span>
+  <!-- ── NAV ── -->
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="/admin/dashboard.html" class="nav-brand">
+        <img src="/uploads/pretty-petty-logo-nav.png" alt="Pretty Petty" class="nav-logo">
+         <span>Pretty Petty <small class="nav-admin-badge">Admin</small></span>
+      </a>
+      <div class="nav-links">
+         <a href="/index.html" id="nav-home-link">Store</a>
+        <a href="/admin/dashboard.html">Dashboard</a>
+        <a href="/admin/products.html">Products</a>
+        <a href="/admin/categories.html" class="active">Categories</a>
+        <a href="/admin/users.html">Users</a>
+        <a href="/admin/orders.html">Orders</a>
+        <a href="/admin/reviews.html">Reviews</a>
+    
+      </div>
+      <div class="nav-user" id="nav-user" style="display:none;">
+        <a href="/profile.html" class="nav-user-link">
+          <img id="user-avatar" src="/uploads/default.png" class="nav-avatar">
+          <span id="user-display-name"></span>
+        </a>
+        <a href="#" id="logout-link">Logout</a>
+      </div>
+      <div id="user-bar" style="display:none;"></div>
+    </div>
+  </nav>
+
+  <div id="alert-banner" class="alert-banner" style="display:none;"></div>
+
+  <!-- ── MAIN CONTENT ── -->
+  <section class="admin-section" style="padding-bottom: 0px;">
+    <div class="admin-inner">
+      <p class="admin-overline">Organization</p>
+      <h2 class="admin-title">Manage Categories</h2>
+
+      <div id="form-success"></div>
+      <div id="form-error"></div>
+
+      <div class="admin-filter-bar">
+        <div class="admin-filter-group">
+          <label>Status</label>
+          <select id="filter-status" class="admin-filter-select">
+            <option value="">All</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
         </div>
-    </header>
-
-    <hr>
-
-    <main>
-        <div id="access-denied" style="display: none; color: red; text-align: center; padding: 20px;">
-            <h2>Access Denied</h2>
-            <p>You do not have admin privileges. Only administrators can access this page.</p>
-            <a href="/login.html">Go to Login</a> | <a href="/index.html">Go to Store</a>
+        <div class="admin-filter-group">
+          <label>Trashed</label>
+          <select id="filter-trashed" class="admin-filter-select">
+            <option value="false">Only Active</option>
+            <option value="true">Include Trashed</option>
+          </select>
         </div>
-        <div id="admin-content">
-        <h2>Manage Categories (MP2 / MP4)</h2>
+      </div>
 
-        <!-- General Form Messages -->
-        <div id="form-success" style="color: green;"></div>
-        <div id="form-error" style="color: red;"></div>
+      <!-- Categories Table -->
+      <table id="categories-table" style="width:100%;">
+        <thead>
+          <tr>
+            <th><input type="checkbox" id="select-all-checkbox"></th>
+            <th>ID</th>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Status</th>
+            <th>Created At</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
 
-        <!-- CATEGORY FORM (Create & Edit) -->
-        <!-- Quiz 4 Validation will target the error spans below -->
-        <form id="category-form" novalidate style="margin-bottom: 30px;">
-            
-            <!-- Hidden ID field for editing existing categories -->
-            <input type="hidden" id="cat-id" name="id" value="">
+      <div class="admin-bulk-bar" id="bulk-bar" style="display:none;">
+        <span class="admin-bulk-count"><span id="selected-count">0</span> selected</span>
+        <button id="bulk-delete-btn" class="admin-btn-danger">Delete Selected</button>
+      </div>
 
-            <div>
-                <label for="cat-name">Category Name:</label><br>
-                <input type="text" id="cat-name" name="name">
-                <span class="error-text" id="cat-name-error" style="color: red;"></span>
-            </div>
-            <br>
+     <div class="admin-divider" style="margin:32px auto;"></div>
 
-            <div>
-                <label for="cat-description">Description:</label><br>
-                <textarea id="cat-description" name="description" rows="3" cols="50"></textarea>
-                <span class="error-text" id="cat-description-error" style="color: red;"></span>
-            </div>
-            <br>
+     <p class="admin-overline">Add & Edit</p>
+    <h2 class="admin-title">Category Form</h2>
 
-            <div>
-                <label for="cat-status">Status:</label><br>
-                <select id="cat-status" name="status">
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                </select>
-                <span class="error-text" id="cat-status-error" style="color: red;"></span>
-            </div>
-            <br>
+      <!-- Category Form -->
+      <div class="admin-form-card" style="margin-bottom: 0px;">
 
-            <div>
-                <label for="cat-image">Category Image:</label><br>
-                <input type="file" id="cat-image" name="image" accept="image/*">
-                <!-- Optional: show current image when editing -->
-                <div id="current-image-container" style="display: none;">
-                    <p>Current Image:</p>
-                    <img id="current-image-preview" src="" alt="Current Image" width="100">
-                </div>
-                <span class="error-text" id="cat-image-error" style="color: red;"></span>
-            </div>
-            <br>
+        <form id="category-form" novalidate>
+          <input type="hidden" id="cat-id" name="id" value="">
 
+          <label for="cat-name">Category Name</label>
+          <input type="text" id="cat-name" name="name">
+          <span class="error-text" id="cat-name-error"></span>
+
+          <label for="cat-description">Description</label>
+          <textarea id="cat-description" name="description" rows="3"></textarea>
+          <span class="error-text" id="cat-description-error"></span>
+
+          <label for="cat-status">Status</label>
+          <select id="cat-status" name="status">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+          <span class="error-text" id="cat-status-error"></span>
+
+          <label for="cat-image" style="padding-top: 20px;">Category Image</label>
+          <input type="file" id="cat-image" name="image" accept="image/*">
+          <div id="current-image-container" style="display:none;">
+            <p>Current Image:</p>
+            <img id="current-image-preview" src="" alt="Current Image">
+          </div>
+          <span class="error-text" id="cat-image-error"></span>
+
+          <div style="display:flex;gap:12px;margin-top:8px; padding-top: 20px;">
             <button type="submit" id="submit-btn">Add Category</button>
-            <button type="button" id="cancel-edit-btn" style="display: none;">Cancel Edit</button>
-
+            <button type="button" id="cancel-edit-btn" style="display:none;">Cancel Edit</button>
+          </div>
         </form>
+      </div>
+    </div>
+  </section>
 
-        <hr>
-
-        <!-- MP4 REQUIREMENT: jQuery Datatable -->
-        <!-- You will initialize this with $('#categories-table').DataTable() in your JS -->
-        <table id="categories-table" style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Image</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                    <th>Created At</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- jQuery/Datatable AJAX will populate these rows -->
-                <!-- 
-                Example of what the AJAX response will render:
-                <tr>
-                    <td>1</td>
-                    <td><img src="path/to/image.jpg" width="50"></td>
-                    <td>Dog Food</td>
-                    <td>Organic and natural dog food</td>
-                    <td>Active</td>
-                    <td>2023-10-25 14:30:00</td>
-                    <td>
-                        <button class="edit-btn" data-id="1" data-name="Dog Food" data-desc="..." data-status="active" data-img="path...">Edit</button>
-                        <button class="delete-btn" data-id="1">Delete</button>
-                    </td>
-                </tr>
-                -->
-            </tbody>
-        </table>
-        </div>
-    </main>
-
-    <hr>
-
-    <footer>
-        <p>&copy; 2023 Pretty Petty Admin Panel. All rights reserved.</p>
-    </footer>
+  <!-- ── FOOTER ── -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-bottom">
+        <p style="font-size:11px;color:#aaa;">&copy; 2025 Pretty Petty Admin. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>

@@ -8,15 +8,15 @@ const sequelize = require("./config/db");
 const cookieParser = require('cookie-parser');
 
 const Auth_Routes = require("./routes/Auth_Routes");
-const Product_Routes = require("./routes/Product_Routes");
-const Category_Routes = require("./routes/Category_Routes");
-const Review_Routes = require("./routes/Review_Routes");
-const Cart_Routes = require("./routes/Cart_Routes");
-const Order_Routes = require("./routes/Order_Routes");
-const User_Routes = require("./routes/User_Routes");
-const Dashboard_Routes = require("./routes/Dashboard_Routes");
-const Search_Routes = require("./routes/Search_Routes");
-const Profile_Routes = require("./routes/Profile_Routes");
+const Product_Routes = require("./routes/product_routes");
+const Category_Routes = require("./routes/category_routes");
+const Review_Routes = require("./routes/review_routes");
+const Cart_Routes = require("./routes/cart_routes");
+const Order_Routes = require("./routes/order_routes");
+const User_Routes = require("./routes/user_routes");
+const Dashboard_Routes = require("./routes/dashboard_routes");
+const Search_Routes = require("./routes/search_routes");
+const Profile_Routes = require("./routes/profile_routes");
 
 const app = express();
 
@@ -24,7 +24,6 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static('uploads'));
-app.use(express.static("public"));
 
 app.use("/api/auth", Auth_Routes);
 app.use("/api/products", Product_Routes);
@@ -36,6 +35,8 @@ app.use("/api/users", User_Routes);
 app.use("/api/dashboard", Dashboard_Routes);
 app.use("/api/search", Search_Routes);
 app.use("/api/profile", Profile_Routes);
+
+app.use(express.static("public"));
 
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "views/index.html")));
 app.get("/index.html", (req, res) => res.sendFile(path.join(__dirname, "views/index.html")));

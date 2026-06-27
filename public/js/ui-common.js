@@ -3,6 +3,14 @@
 
     const DEFAULT_API = 'http://localhost:3000';
 
+    function resolveApiBase() {
+        var origin = window.location.origin;
+        if (window.location.protocol === 'file:' || !origin || origin === 'null') {
+            return DEFAULT_API;
+        }
+        return origin;
+    }
+
     function ensureConfirmDialog() {
         if ($('#pp-confirm-dialog').length) {
             return $('#pp-confirm-dialog');
@@ -12,7 +20,8 @@
     }
 
     window.PrettyPettyUI = {
-        apiBase: DEFAULT_API,
+        apiBase: resolveApiBase(),
+        resolveApiBase: resolveApiBase,
 
         initButtons: function (selector) {
             const $targets = $(selector || 'button, input[type="submit"]');

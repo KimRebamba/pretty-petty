@@ -1,85 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pretty Petty - Register</title>
-     
-    <link rel="stylesheet" href="/css/customer.css">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pretty Petty — Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/customer.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
 </head>
 <body>
 
-    <nav>
-        <a href="index.html">Home</a> | 
+  <div id="alert-banner" class="alert-banner" style="display:none;"></div>
+
+  <!-- Simplified nav for register -->
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="/uploads/pretty-petty-logo-nav.png" alt="Pretty Petty" class="nav-logo">
+        <span>Pretty Petty</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html" id="nav-home-link">Home</a>
         <a href="login.html">Login</a>
-    </nav>
+      </div>
+    </div>
+  </nav>
 
-    <h2>Create an Account</h2>
+  <section class="page-section">
+    <div class="section-inner">
 
-    <div id="general-error" style="color: red; display: none;"></div>
+      <div class="form-card" style="max-width:480px;">
+        <h2 class="page-title">Create Account</h2>
+        <p class="page-subtitle">Join Pretty Petty to start shopping.</p>
 
-    <form id="register-form">
-        
-        <div>
-            <label for="first_name">First Name:</label><br>
+        <div id="general-error" class="text-error" style="display:none; margin-bottom:12px;"></div>
+
+        <form id="register-form">
+          <div style="margin-bottom:16px;">
+            <label for="first_name">First Name</label>
             <input type="text" id="first_name" name="first_name" required>
-            <span class="error-text" id="first_name-error" style="color: red;"></span>
-        </div>
-        <br>
+            <span class="error-text" id="first_name-error"></span>
+          </div>
 
-        <div>
-            <label for="last_name">Last Name:</label><br>
+          <div style="margin-bottom:16px;">
+            <label for="last_name">Last Name</label>
             <input type="text" id="last_name" name="last_name" required>
-            <span class="error-text" id="last_name-error" style="color: red;"></span>
-        </div>
-        <br>
+            <span class="error-text" id="last_name-error"></span>
+          </div>
 
-        <div>
-            <label for="email">Email:</label><br>
+          <div style="margin-bottom:16px;">
+            <label for="email">Email</label>
             <input type="email" id="email" name="email" required>
-            <span class="error-text" id="email-error" style="color: red;"></span>
-        </div>
-        <br>
+            <span class="error-text" id="email-error"></span>
+          </div>
 
-        <div>
-            <label for="password">Password:</label><br>
+          <div style="margin-bottom:16px;">
+            <label for="password">Password</label>
             <input type="password" id="password" name="password" required>
-            <span class="error-text" id="password-error" style="color: red;"></span>
-        </div>
-        <br>
+            <span class="error-text" id="password-error"></span>
+          </div>
 
-        <div>
-            <label for="password_confirmation">Confirm Password:</label><br>
+          <div style="margin-bottom:16px;">
+            <label for="password_confirmation">Confirm Password</label>
             <input type="password" id="password_confirmation" name="password_confirmation" required>
-            <span class="error-text" id="password_confirmation-error" style="color: red;"></span>
-        </div>
-        <br>
+            <span class="error-text" id="password_confirmation-error"></span>
+          </div>
 
-        <div>
-            <label for="delivery_address">Delivery Address (Optional):</label><br>
+          <div style="margin-bottom:16px;">
+            <label for="delivery_address">Delivery Address (Optional)</label>
             <textarea id="delivery_address" name="delivery_address" rows="3"></textarea>
-            <span class="error-text" id="delivery_address-error" style="color: red;"></span>
-        </div>
-        <br>
+            <span class="error-text" id="delivery_address-error"></span>
+          </div>
 
-        <div>
-            <label for="image">Profile Image (Optional):</label><br>
+          <div style="margin-bottom:16px;">
+            <label for="image">Profile Image (Optional)</label>
             <input type="file" id="image" name="image" accept="image/*">
-            <span class="error-text" id="image-error" style="color: red;"></span>
-        </div>
-        <br>
+            <span class="error-text" id="image-error"></span>
+          </div>
 
-        <button type="submit">Register</button>
+          <button type="submit">Register</button>
+        </form>
 
-    </form>
+        <p style="font-size:12px; color:#888; margin-top:20px;">
+          Already have an account? <a href="login.html" style="color:#1a1a1a; text-decoration:underline;">Login here</a>
+        </p>
+      </div>
 
-    <p>Already have an account? <a href="login.html">Login here</a></p>
+    </div>
+  </section>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
-    <script src="/js/ui-common.js"></script>
-    <script src="/js/register.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
+  <script src="/js/ui-common.js"></script>
+  <script src="/js/register.js"></script>
 </body>
 </html>

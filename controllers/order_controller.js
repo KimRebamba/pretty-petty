@@ -1,12 +1,18 @@
 const { Order, Order_Item, User, Product } = require('../models/associations');
 const { Cart, Cart_Item } = require('../models/associations');
 const nodemailer = require('nodemailer');
+const { findRecord } = require('../utils/findRecord');
 
 const index = async (req, res) => {
     try {
-        const limit = req.query.limit ? parseInt(req.query.limit) : null;
+        const includeDeleted = req.query.includeDeleted === 'true';
+        const where = {};
+        if (req.query.status) {
+            where.status = req.query.status;
+        }
 
         const orders = await Order.findAll({
+            where,
             include: [
                 {
                     model: User,
@@ -18,7 +24,8 @@ const index = async (req, res) => {
                 }
             ],
             order: [['created_at', 'DESC']],
-            ...(limit ? { limit } : {})
+            ...(req.query.limit ? { limit: parseInt(req.query.limit) } : {}),
+            paranoid: !includeDeleted
         });
 
         return res.json(orders);
@@ -30,7 +37,7 @@ const index = async (req, res) => {
 
 const show = async (req, res) => {
     try {
-        const order = await Order.findByPk(req.params.id, {
+        const order = await findRecord(Order, req.params.id, {
             include: [
                 {
                     model: User,
@@ -135,7 +142,7 @@ const update = async (req, res) => {
         const { status } = req.body;
         const { id } = req.params;
 
-        const order = await Order.findByPk(id, {
+        const order = await findRecord(Order, id, {
             include: [
                 { model: User },
                 {
@@ -147,6 +154,10 @@ const update = async (req, res) => {
 
         if (!order) {
             return res.status(404).json({ message: 'Order not found' });
+        }
+
+        if (order.deleted_at) {
+            return res.status(400).json({ message: 'Order is deleted. Restore it before updating.' });
         }
 
         order.status = status;
@@ -293,11 +304,25 @@ const cancel = async (req, res) => {
     }
 };
 
+const restore = async (req, res) => {
+    try {
+        const order = await Order.findByPk(req.params.id, { paranoid: false });
+        if (!order) return res.status(404).json({ message: 'Order not found' });
+        if (!order.deleted_at) return res.status(400).json({ message: 'Order is not deleted' });
+        await order.restore();
+        return res.json(order);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 module.exports = {
     index,
     show,
     store,
     update,
     myOrders,
-    cancel
+    cancel,
+    restore
 };

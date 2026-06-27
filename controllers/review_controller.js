@@ -1,11 +1,15 @@
 const { Review, User, Product, Order, Order_Item } = require('../models/associations');
+const { findRecord } = require('../utils/findRecord');
 
 const index = async (req, res) => {
     try {
+        const includeDeleted = req.query.includeDeleted === 'true';
         const where = {};
         if (req.query.product_id) {
             where.product_id = req.query.product_id;
         }
+        if (req.query.verified === 'true') where.verified_at = { [require('sequelize').Op.ne]: null };
+        if (req.query.verified === 'false') where.verified_at = null;
 
         const reviews = await Review.findAll({
             where,
@@ -19,7 +23,8 @@ const index = async (req, res) => {
                     attributes: ['id', 'name']
                 }
             ],
-            order: [['created_at', 'DESC']]
+            order: [['created_at', 'DESC']],
+            paranoid: !includeDeleted
         });
 
         return res.json(reviews);
@@ -31,8 +36,12 @@ const index = async (req, res) => {
 
 const show = async (req, res) => {
     try {
-        const review = await Review.findByPk(req.params.id, {
+        const review = await findRecord(Review, req.params.id, {
             include: [
+                {
+                    model: User,
+                    attributes: ['id', 'first_name', 'last_name']
+                },
                 {
                     model: Product,
                     attributes: ['id', 'name']
@@ -44,7 +53,9 @@ const show = async (req, res) => {
             return res.status(404).json({ message: 'Review not found' });
         }
 
-        if (review.user_id !== req.user.id) {
+        const isOwner = review.user_id === req.user.id;
+        const isAdmin = req.user.role === 'admin';
+        if (!isOwner && !isAdmin) {
             return res.status(403).json({ message: 'Not authorized to view this review' });
         }
 
@@ -177,7 +188,7 @@ const update = async (req, res) => {
 
 const destroy = async (req, res) => {
     try {
-        const review = await Review.findByPk(req.params.id);
+        const review = await findRecord(Review, req.params.id);
 
         if (!review) {
             return res.status(404).json({ message: 'Review not found' });
@@ -188,6 +199,10 @@ const destroy = async (req, res) => {
 
         if (!isOwner && !isAdmin) {
             return res.status(403).json({ message: 'Not authorized to delete this review' });
+        }
+
+        if (review.deleted_at) {
+            return res.status(400).json({ message: 'Review is already deleted' });
         }
 
         await review.destroy();
@@ -201,10 +216,14 @@ const destroy = async (req, res) => {
 
 const verify = async (req, res) => {
     try {
-        const review = await Review.findByPk(req.params.id);
+        const review = await findRecord(Review, req.params.id);
 
         if (!review) {
             return res.status(404).json({ message: 'Review not found' });
+        }
+
+        if (review.deleted_at) {
+            return res.status(400).json({ message: 'Review is deleted. Restore it before verifying.' });
         }
 
         review.verified_at = new Date();
@@ -249,6 +268,33 @@ const myReviews = async (req, res) => {
     }
 };
 
+const restore = async (req, res) => {
+    try {
+        const review = await Review.findByPk(req.params.id, { paranoid: false });
+        if (!review) return res.status(404).json({ message: 'Review not found' });
+        if (!review.deleted_at) return res.status(400).json({ message: 'Review is not deleted' });
+        await review.restore();
+        return res.json(review);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+const bulkDelete = async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ message: 'No IDs provided' });
+        }
+        const result = await Review.destroy({ where: { id: ids } });
+        return res.json({ message: result + ' reviews deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 module.exports = {
     index,
     show,
@@ -256,5 +302,7 @@ module.exports = {
     update,
     destroy,
     verify,
-    myReviews
+    myReviews,
+    restore,
+    bulkDelete
 };

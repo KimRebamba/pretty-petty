@@ -1,69 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pretty Petty - My Orders</title>
-     
-    <link rel="stylesheet" href="/css/customer.css">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pretty Petty — My Orders</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/customer.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
 </head>
 <body>
 
-    <header>
-        <h1>Pretty Petty</h1>
-        <nav>
-            <a href="index.html">Home</a> | 
-            <a href="products.html">Products</a> | 
-            <a href="cart.html">Cart (<span class="cart-count">0</span>)</a> | 
-            <a href="profile-orders.html">My Orders</a> | 
-            <a href="profile-reviews.html">My Reviews</a> | 
-            <a href="profile.html">Profile</a> | 
-            <span id="nav-auth">
-                <a href="login.html">Login</a> | 
-                <a href="register.html">Register</a>
-            </span>
-            <span id="nav-user" style="display: none;">
-                <a href="#" id="logout-link">Logout</a>
-            </span>
-        </nav>
-        <div id="user-bar" style="display: none; align-items: center; gap: 10px; margin-top: 5px; font-size: 14px;">
-            <img id="user-avatar" src="/uploads/default.png" width="25" height="25" style="border-radius: 50%;">
-            <span id="user-display-name"></span>
-        </div>
-    </header>
+  <div id="alert-banner" class="alert-banner" style="display:none;"></div>
 
-    <hr>
-
-    <div id="not-logged-in" style="display: none; text-align: center; padding: 40px;">
-        <h2>Please Log In</h2>
-        <p>You need to be logged in to view your orders.</p>
-        <a href="login.html">Go to Login</a>
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="/uploads/pretty-petty-logo-nav.png" alt="Pretty Petty" class="nav-logo">
+        <span>Pretty Petty</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html" id="nav-home-link">Home</a>
+        <a href="products.html">Products</a>
+        <a href="products.html#categories-section" id="nav-categories-link" style="display:none;">Categories</a>
+        <a href="profile-orders.html" class="nav-auth-only" style="display:none;">Orders</a>
+        <a href="profile-reviews.html" class="nav-auth-only" style="display:none;">Reviews</a>
+        <a href="cart.html" class="nav-cart-text">Cart <span class="cart-count">0</span></a>
+      </div>
+      <div class="nav-auth-links" id="nav-auth-links">
+        <a href="login.html">Login</a>
+        <a href="register.html">Register</a>
+      </div>
+      <div class="nav-user" id="nav-user" style="display:none;">
+        <a href="profile.html" class="nav-user-link">
+          <img id="user-avatar" src="/uploads/default.png" class="nav-avatar">
+          <span id="user-display-name"></span>
+        </a>
+        <a href="#" id="logout-link">Logout</a>
+      </div>
+      <div id="user-bar" style="display:none;"></div>
     </div>
+  </nav>
 
-    <main id="orders-content">
-        <h2>My Orders</h2>
+  <section class="page-section">
+    <div class="section-inner">
 
-        <div id="orders-loading">Loading orders...</div>
-        <div id="orders-empty" style="display: none; text-align: center; padding: 20px;">
-            <p>You haven't placed any orders yet.</p>
-            <a href="products.html">Browse Products</a>
+      <h2 class="section-title">My Orders</h2>
+
+      <div id="orders-loading"><p style="font-size:12px; color:#888;">Loading orders...</p></div>
+
+      <div id="orders-empty" class="empty-state" style="display:none;">
+        <p>You haven't placed any orders yet.</p>
+        <a href="products.html">Browse Products</a>
+      </div>
+
+      <div id="orders-list"></div>
+
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <img src="/uploads/pretty-petty-logo.png" alt="Pretty Petty">
+            <span>Pretty Petty</span>
+          </div>
+          <p class="footer-tagline">Thoughtful essentials for the animals you love.</p>
         </div>
+        <div class="footer-col">
+          <p class="footer-col-title">Shop</p>
+          <ul>
+            <li><a href="products.html">All Products</a></li>
+            <li><a href="cart.html">Cart</a></li>
+            <li><a href="profile-orders.html">My Orders</a></li>
+            <li><a href="profile-reviews.html">My Reviews</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <p class="footer-col-title">Account</p>
+          <ul>
+            <li><a href="profile.html">Profile</a></li>
+            <li><a href="login.html">Login</a></li>
+            <li><a href="register.html">Register</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Pretty Petty. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
-        <div id="orders-list"></div>
-
-    </main>
-
-    <hr>
-
-    <footer>
-        <p>&copy; 2023 Pretty Petty. All rights reserved.</p>
-    </footer>
-
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
-    <script src="/js/ui-common.js"></script>
-    <script src="/js/profile-orders.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
+  <script src="/js/ui-common.js"></script>
+  <script src="/js/profile-orders.js"></script>
 </body>
 </html>

@@ -3,34 +3,62 @@ $(document).ready(function () {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    // If not logged in, show message and hide form
     if (!token || !user.id) {
-        $('#not-logged-in').show();
-        $('#profile-content').hide();
-        $('#user-bar').hide();
+        window.location.href = '/index.html?msg=login_required';
         return;
     }
-
+ PrettyPettyUI.initButtons('#logout-link');
     PrettyPettyUI.initButtons('button, input[type="submit"]');
 
-    // User bar
-    if (user.first_name || user.last_name) {
-        $('#user-display-name').text('Hi, ' + (user.first_name || '') + ' ' + (user.last_name || ''));
+    // ── Alert banner ──
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const msg = params.get('msg');
+        if (msg) {
+            const $b = $('#alert-banner');
+            let text = '';
+            if (msg === 'login_required') text = 'You need to be logged in to access that page. <a href="login.html">Log in</a> or <a href="register.html">create an account</a>.';
+            else if (msg === 'admin_required') text = 'You do not have permission to access that page.';
+            else if (msg === 'access_denied') text = 'Access denied.';
+            else text = msg;
+            $b.html(text).slideDown(200);
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    })();
+
+    // ── User state ──
+    function initUserState() {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const t = localStorage.getItem('token');
+        if (t && user && user.id) {
+            $('#nav-auth-links').hide();
+            $('#nav-user').css('display', 'flex');
+            $('.nav-auth-only').show();
+            $('#nav-categories-link').hide();
+            const fullName = (user.first_name || '') + ' ' + (user.last_name || '');
+            $('#user-display-name').text(fullName);
+            if (user.image_path) $('#user-avatar').attr('src', user.image_path);
+            if (user.role === 'admin') {
+                $('#nav-home-link').attr('href', '/admin/dashboard.html').text('Admin');
+            }
+        } else {
+            $('#nav-auth-links').show();
+            $('#nav-user').hide();
+            $('.nav-auth-only').hide();
+            $('#nav-categories-link').show();
+        }
     }
-    if (user.image_path) $('#user-avatar').attr('src', user.image_path);
-    $('#user-bar').css('display', 'flex');
-    $('#nav-auth').hide();
-    $('#nav-user').css('display', 'inline');
+    initUserState();
 
     // Logout
-    $('#logout-link').on('click', function (e) {
+    $(document).on('click', '#logout-link', function (e) {
         e.preventDefault();
         if (token) {
             $.ajax({ url: API + '/api/auth/logout', method: 'POST', headers: { 'Authorization': 'Bearer ' + token } });
         }
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        window.location.href = '/login.html';
+        window.location.href = '/index.html?msg=login_required';
     });
 
     // ── Cart count ──
@@ -103,8 +131,7 @@ $(document).ready(function () {
                 // Update avatar
                 if (updatedUser.image_path) $('#current-avatar').attr('src', updatedUser.image_path);
                 // Update user bar
-                $('#user-display-name').text('Hi, ' + (updatedUser.first_name || '') + ' ' + (updatedUser.last_name || ''));
-                $('#user-avatar').attr('src', updatedUser.image_path || '/uploads/default.png');
+                initUserState();
                 setTimeout(function () { $('#profile-success').text(''); }, 3000);
             },
             error: function (xhr) {

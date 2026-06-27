@@ -1,6 +1,7 @@
 const { Product, Category, Product_Image, Review, User } = require('../models/associations');
 const path = require('path');
 const fs = require('fs');
+const { findRecord } = require('../utils/findRecord');
 
 function normalizeImagePath(filePath) {
     return filePath.replace(/\\/g, '/').replace(/^public\//, '/');
@@ -8,9 +9,13 @@ function normalizeImagePath(filePath) {
 
 const index = async (req, res) => {
     try {
+        const includeDeleted = req.query.includeDeleted === 'true';
         const where = {};
         if (req.query.category_id) {
             where.category_id = req.query.category_id;
+        }
+        if (req.query.status) {
+            where.status = req.query.status;
         }
 
         const products = await Product.findAll({
@@ -23,7 +28,8 @@ const index = async (req, res) => {
                 },
                 { model: Review, include: [{ model: User, attributes: ['id', 'first_name', 'last_name'] }] }
             ],
-            order: [['created_at', 'DESC']]
+            order: [['created_at', 'DESC']],
+            paranoid: !includeDeleted
         });
 
         return res.json(products);
@@ -91,10 +97,14 @@ const store = async (req, res) => {
 
 const update = async (req, res) => {
     try {
-        const product = await Product.findByPk(req.params.id);
+        const product = await findRecord(Product, req.params.id);
 
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
+        }
+
+        if (product.deleted_at) {
+            return res.status(400).json({ message: 'Product is deleted. Restore it before editing.' });
         }
 
         const { name, category_id, description, price, stock, status } = req.body;
@@ -132,10 +142,14 @@ const update = async (req, res) => {
 
 const destroy = async (req, res) => {
     try {
-        const product = await Product.findByPk(req.params.id);
+        const product = await findRecord(Product, req.params.id);
 
         if (!product) {
             return res.status(404).json({ message: 'Product not found' });
+        }
+
+        if (product.deleted_at) {
+            return res.status(400).json({ message: 'Product is already deleted' });
         }
 
         await product.destroy();
@@ -164,11 +178,40 @@ const destroyImage = async (req, res) => {
     }
 };
 
+const restore = async (req, res) => {
+    try {
+        const product = await Product.findByPk(req.params.id, { paranoid: false });
+        if (!product) return res.status(404).json({ message: 'Product not found' });
+        if (!product.deleted_at) return res.status(400).json({ message: 'Product is not deleted' });
+        await product.restore();
+        return res.json(product);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
+const bulkDelete = async (req, res) => {
+    try {
+        const { ids } = req.body;
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
+            return res.status(400).json({ message: 'No IDs provided' });
+        }
+        const result = await Product.destroy({ where: { id: ids } });
+        return res.json({ message: result + ' products deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 module.exports = {
     index,
     show,
     store,
     update,
     destroy,
-    destroyImage
+    destroyImage,
+    restore,
+    bulkDelete
 };

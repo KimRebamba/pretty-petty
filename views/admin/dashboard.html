@@ -1,144 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pretty Petty - Admin Dashboard</title>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pretty Petty Admin — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
 </head>
 <body>
 
-    <header>
-        <h1>Pretty Petty Admin</h1>
-        <nav>
-            <a href="/admin/dashboard.html">Dashboard</a> | 
-            <a href="/admin/products.html">Products</a> | 
-            <a href="/admin/categories.html">Categories</a> | 
-            <a href="/admin/users.html">Users</a> | 
-            <a href="/admin/orders.html">Orders</a> | 
-            <a href="/admin/reviews.html">Reviews</a> | 
-            <a href="/index.html">View Store</a> | 
-            <a href="/profile.html">Profile</a> | 
-            <a href="#" id="logout-btn">Logout</a>
-        </nav>
-        <div id="user-info" style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
-            <img id="user-avatar" src="/uploads/default.png" width="30" height="30" style="border-radius: 50%;">
-            <span id="user-display-name">Admin</span>
-            <span id="user-role-badge" style="background: #007bff; color: white; padding: 2px 8px; border-radius: 4px; font-size: 12px;">ADMIN</span>
+  <!-- ── NAV ── -->
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="/admin/dashboard.html" class="nav-brand">
+        <img src="/uploads/pretty-petty-logo-nav.png" alt="Pretty Petty" class="nav-logo">
+        <span>Pretty Petty <small class="nav-admin-badge">Admin</small></span>
+      </a>
+      <div class="nav-links">
+         <a href="/index.html" id="nav-home-link">Store</a>
+        <a href="/admin/dashboard.html" class="active">Dashboard</a>
+        <a href="/admin/products.html">Products</a>
+        <a href="/admin/categories.html">Categories</a>
+        <a href="/admin/users.html">Users</a>
+        <a href="/admin/orders.html">Orders</a>
+        <a href="/admin/reviews.html">Reviews</a>
+
+      </div>
+      <div class="nav-user" id="nav-user" style="display:none;">
+        <a href="/profile.html" class="nav-user-link">
+          <img id="user-avatar" src="/uploads/default.png" class="nav-avatar">
+          <span id="user-display-name"></span>
+        </a>
+        <a href="#" id="logout-link">Logout</a>
+      </div>
+      <div id="user-bar" style="display:none;"></div>
+    </div>
+  </nav>
+
+  <div id="alert-banner" class="alert-banner" style="display:none;"></div>
+
+  <!-- ── MAIN CONTENT ── -->
+  <section class="admin-section" style="padding-bottom: 0px;">
+    <div class="admin-inner">
+      <p class="admin-overline">Overview</p>
+      <h2 class="admin-title">Dashboard</h2>
+
+      <div id="dashboard-error"></div>
+      <div id="dashboard-success"></div>
+
+      <!-- Stat Cards -->
+      <div class="stat-grid">
+        <div class="stat-card">
+          <p class="stat-overline">Total Revenue</p>
+          <p class="stat-value">$<span id="stat-revenue">0.00</span></p>
         </div>
-    </header>
-
-    <hr>
-
-    <main>
-        <div id="access-denied" style="display: none; color: red; text-align: center; padding: 20px;">
-            <h2>Access Denied</h2>
-            <p>You do not have admin privileges. Only administrators can access this page.</p>
-            <a href="/login.html">Go to Login</a> | <a href="/index.html">Go to Store</a>
+        <div class="stat-card">
+          <p class="stat-overline">Total Orders</p>
+          <p class="stat-value"><span id="stat-orders">0</span></p>
         </div>
-        <div id="admin-content">
-        <h2>Dashboard Overview</h2>
-
-        <!-- General messages -->
-        <div id="dashboard-error" style="color: red;"></div>
-        <div id="dashboard-success" style="color: green;"></div>
-
-        <!-- QUICK STATS SECTION (Ties to UI/UX Design Unit Test) -->
-        <!-- jQuery will fetch counts/totals and update these spans -->
-        <div style="display: flex; gap: 20px; margin-bottom: 40px;">
-            <div style="border: 1px solid black; padding: 15px; width: 20%;">
-                <h3>Total Revenue</h3>
-                <p>$<span id="stat-revenue">0.00</span></p>
-            </div>
-            <div style="border: 1px solid black; padding: 15px; width: 20%;">
-                <h3>Total Orders</h3>
-                <p><span id="stat-orders">0</span></p>
-            </div>
-            <div style="border: 1px solid black; padding: 15px; width: 20%;">
-                <h3>Total Users</h3>
-                <p><span id="stat-users">0</span></p>
-            </div>
-            <div style="border: 1px solid black; padding: 15px; width: 20%;">
-                <h3>Total Products</h3>
-                <p><span id="stat-products">0</span></p>
-            </div>
+        <div class="stat-card">
+          <p class="stat-overline">Total Users</p>
+          <p class="stat-value"><span id="stat-users">0</span></p>
         </div>
-
-        <hr>
-
-        <!-- QUIZ 7 REQUIREMENT: Three (3) JS Charts (Bar, Line, Pie) -->
-        <!-- You will use the Chart.js library to render data inside these canvases -->
-        <section>
-            <h2>Sales & Analytics Charts</h2>
-
-            <div style="display: flex; gap: 40px;">
-                
-                <!-- LINE CHART: e.g., Monthly Sales over the last 12 months -->
-                <div style="width: 50%;">
-                    <h3>Monthly Sales (Line Chart)</h3>
-                    <canvas id="sales-line-chart" width="400" height="200"></canvas>
-                </div>
-
-                <!-- PIE CHART: e.g., Order Status Distribution (Pending, Paid, Completed, Cancelled) -->
-                <div style="width: 50%;">
-                    <h3>Order Statuses (Pie Chart)</h3>
-                    <canvas id="orders-pie-chart" width="400" height="200"></canvas>
-                </div>
-
-            </div>
-
-            <br><br>
-
-            <!-- BAR CHART: e.g., Top Selling Categories or Products -->
-            <div style="width: 80%; margin: 0 auto;">
-                <h3>Products per Category (Bar Chart)</h3>
-                <canvas id="categories-bar-chart" width="800" height="300"></canvas>
-            </div>
-
-        </section>
-
-        <hr>
-
-        <!-- RECENT ORDERS TABLE (Good for UI/UX and testing Term Test API) -->
-        <section>
-            <h2>Recent Orders</h2>
-            <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody id="recent-orders-body">
-                    <!-- jQuery will fetch /api/orders?limit=5 and populate this -->
-                    <!-- 
-                    Example of what jQuery will inject:
-                    <tr>
-                        <td>#1024</td>
-                        <td>John Doe</td>
-                        <td>Pending</td>
-                        <td>2023-10-25</td>
-                        <td><a href="/admin/admin-orders.html">View Details</a></td>
-                    </tr>
-                    -->
-                    <tr>
-                        <td colspan="5">Loading recent orders...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
+        <div class="stat-card">
+          <p class="stat-overline">Total Products</p>
+          <p class="stat-value"><span id="stat-products">0</span></p>
         </div>
-    </main>
+      </div>
 
-    <hr>
+      <!-- Recent Orders -->
+      <div class="admin-divider" style="margin:32px auto;"></div>
 
-    <footer>
-        <p>&copy; 2023 Pretty Petty Admin Panel. All rights reserved.</p>
-    </footer>
+      <p class="admin-overline" style="margin-bottom:16px;">Recent Orders</p>
+      <table class="recent-orders-table">
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="recent-orders-body">
+          <tr>
+            <td colspan="5" style="text-align:center;">Loading recent orders...</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="admin-divider" style="margin:32px auto;"></div>
+      <!-- Charts -->
+      <p class="admin-overline" style="margin-bottom:16px;">Sales & Analytics</p>
+
+      <div class="chart-grid">
+        <div class="chart-container">
+          <p class="chart-title">Monthly Sales</p>
+          <canvas id="sales-line-chart"></canvas>
+        </div>
+        <div class="chart-container">
+          <p class="chart-title">Order Statuses</p>
+          <canvas id="orders-pie-chart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-full">
+        <div class="chart-container">
+          <p class="chart-title">Products per Category</p>
+          <canvas id="categories-bar-chart"></canvas>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── FOOTER ── -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-bottom">
+        <p style="font-size:11px;color:#aaa;">&copy; 2025 Pretty Petty Admin. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>

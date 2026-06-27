@@ -1,51 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pretty Petty - Login</title>
-     
-    <link rel="stylesheet" href="/css/customer.css">
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
-    <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pretty Petty — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/customer.css">
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.14.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/css/jquery-ui-overrides.css">
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
 </head>
 <body>
 
-    <nav>
-        <a href="index.html">Home</a> | 
+  <div id="alert-banner" class="alert-banner" style="display:none;"></div>
+
+  <!-- Simplified nav for login -->
+  <nav class="site-nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="/uploads/pretty-petty-logo-nav.png" alt="Pretty Petty" class="nav-logo">
+        <span>Pretty Petty</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html" id="nav-home-link">Home</a>
         <a href="products.html">Products</a>
-    </nav>
+      </div>
+    </div>
+  </nav>
 
-    <h2>Login to Pretty Petty</h2>
+  <section class="page-section">
+    <div class="section-inner">
 
-    <div id="login-message" style="color: orange; display: none; margin-bottom: 10px;"></div>
-    <div id="general-error" style="color: red; display: none;"></div>
+      <div class="form-card">
+        <h2 class="page-title">Login</h2>
+        <p class="page-subtitle">Welcome back. Sign in to your account.</p>
 
-    <form id="login-form">
-        
-        <div>
-            <label for="email">Email:</label><br>
+        <div id="login-message" class="text-error" style="display:none; margin-bottom:12px;"></div>
+        <div id="general-error" class="text-error" style="display:none; margin-bottom:12px;"></div>
+
+        <form id="login-form">
+          <div style="margin-bottom:16px;">
+            <label for="email">Email</label>
             <input type="email" id="email" name="email" required>
-            <span class="error-text" id="email-error" style="color: red;"></span>
-        </div>
-        <br>
+            <span class="error-text" id="email-error"></span>
+          </div>
 
-        <div>
-            <label for="password">Password:</label><br>
+          <div style="margin-bottom:16px;">
+            <label for="password">Password</label>
             <input type="password" id="password" name="password" required>
-            <span class="error-text" id="password-error" style="color: red;"></span>
-        </div>
-        <br>
+            <span class="error-text" id="password-error"></span>
+          </div>
 
-        <button type="submit">Login</button>
+          <button type="submit">Login</button>
+        </form>
 
-    </form>
+        <p style="font-size:12px; color:#888; margin-top:20px;">
+          Don't have an account? <a href="register.html" style="color:#1a1a1a; text-decoration:underline;">Register here</a>
+        </p>
+      </div>
 
-    <p>Don't have an account? <a href="register.html">Register here</a></p>
+    </div>
+  </section>
 
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
-    <script src="/js/ui-common.js"></script>
-    <script src="/js/login.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.14.1/jquery-ui.min.js"></script>
+  <script src="/js/ui-common.js"></script>
+  <script src="/js/login.js"></script>
 </body>
 </html>

@@ -2,45 +2,139 @@ $(document).ready(function() {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
-    if (token && user) {
-        // Update header user info
-        const fullName = (user.first_name || '') + ' ' + (user.last_name || '');
-        $('#user-display-name').text(fullName || 'Admin');
-        if (user.image_path) {
-            $('#user-avatar').attr('src', user.image_path);
-        }
-    }
-
     if (!token || user.role !== 'admin') {
-        $('#access-denied').show();
-        $('#admin-content').hide();
-        $('#user-info').hide();
-        // Don't redirect — show the message instead
+        window.location.href = '/index.html?msg=admin_required';
         return;
     }
 
-    const API = 'http://localhost:3000';
+    const params = new URLSearchParams(window.location.search);
+    const msg = params.get('msg');
+    if (msg) {
+        const $banner = $('#alert-banner');
+        let text = msg.replace(/_/g, ' ');
+        $banner.text(text).show();
+        setTimeout(function () { $banner.slideUp(); }, 5000);
+        if (window.history.replaceState) {
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    }
 
-    PrettyPettyUI.initButtons('button, input[type="submit"], #cancel-edit-btn');
-    PrettyPettyUI.initSelectmenu('#prod-category, #prod-status');
+    function initUserState() {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const token = localStorage.getItem('token');
+        if (token && user && user.id) {
+            $('#nav-user').css('display', 'flex');
+            const fullName = (user.first_name || '') + ' ' + (user.last_name || '');
+            $('#user-display-name').text(fullName || 'Admin');
+            if (user.image_path) $('#user-avatar').attr('src', user.image_path);
+        }
+    }
+    initUserState();
 
-    // Logout handler
-    $('#logout-btn').on('click', function(e) {
+    $('#logout-link').on('click', function(e) {
         e.preventDefault();
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         window.location.href = '/login.html';
     });
 
+    const API = PrettyPettyUI.apiBase;
+
+    PrettyPettyUI.initButtons('#logout-link');
+    PrettyPettyUI.initButtons('button, input[type="submit"], #cancel-edit-btn');
+    PrettyPettyUI.initSelectmenu('#prod-category, #prod-status');
+    PrettyPettyUI.initButtons('#submit-btn', '#cancel-edit-btn');
+
     let productsTable;
+
+    function getFilterParams() {
+        const params = [];
+        const status = $('#filter-status').val();
+        const trashed = $('#filter-trashed').val();
+        if (status) params.push('status=' + encodeURIComponent(status));
+        if (trashed === 'true') params.push('includeDeleted=true');
+        return params.length ? '?' + params.join('&') : '';
+    }
+
+    $('#filter-status, #filter-trashed').on('change', function() {
+        loadProducts();
+    });
+
+    function renderProductActions(p) {
+        const id = p.id;
+        if (p.deleted_at) {
+            return '<button class="restore-btn" data-id="' + id + '">Restore</button>';
+        }
+        return '<button class="edit-btn" data-id="' + id + '">Edit</button> <button class="delete-btn" data-id="' + id + '">Delete</button>';
+    }
+
+    $(document).on('change', '#select-all-checkbox', function() {
+        $('.row-checkbox').prop('checked', this.checked);
+        updateBulkBar();
+    });
+
+    $(document).on('change', '.row-checkbox', function() {
+        updateBulkBar();
+        const total = $('.row-checkbox').length;
+        const checked = $('.row-checkbox:checked').length;
+        $('#select-all-checkbox').prop('checked', total > 0 && total === checked);
+    });
+
+    function updateBulkBar() {
+        const count = $('.row-checkbox:checked').length;
+        if (count > 0) {
+            $('#selected-count').text(count);
+            $('#bulk-bar').show();
+        } else {
+            $('#bulk-bar').hide();
+        }
+    }
+
+    $('#bulk-delete-btn').on('click', function() {
+        const ids = [];
+        $('.row-checkbox:checked').each(function() {
+            ids.push(parseInt($(this).data('id')));
+        });
+        if (ids.length === 0) return;
+        PrettyPettyUI.confirm('Delete ' + ids.length + ' selected item(s)?', function() {
+            $.ajax({
+                url: API + '/api/products/bulk',
+                method: 'DELETE',
+                headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+                data: JSON.stringify({ ids: ids }),
+                success: function(res) {
+                    $('#form-success').text(res.message);
+                    $('#select-all-checkbox').prop('checked', false);
+                    loadProducts();
+                },
+                error: function(xhr) {
+                    $('#form-error').text(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Bulk delete failed.');
+                }
+            });
+        });
+    });
+
+    $(document).on('click', '.restore-btn', function() {
+        const id = $(this).data('id');
+        PrettyPettyUI.confirm('Restore this product?', function() {
+            $.ajax({
+                url: API + '/api/products/' + id + '/restore',
+                method: 'PUT',
+                headers: { Authorization: 'Bearer ' + token },
+                success: function() { loadProducts(); },
+                error: function(xhr) {
+                    $('#form-error').text(xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'Restore failed.');
+                }
+            });
+        });
+    });
 
     function loadProducts() {
         $.ajax({
-            url: API + '/api/products',
+            url: API + '/api/products' + getFilterParams(),
             method: 'GET',
             headers: { Authorization: 'Bearer ' + token },
             success: function(res) {
-                // API returns a plain array directly
                 const products = (Array.isArray(res) ? res : []).map(function(p) {
                     const img = (p.Product_Images && p.Product_Images.length > 0) ? p.Product_Images[0].image_path || p.Product_Images[0] : '/uploads/no-image.jpg';
                     return {
@@ -52,7 +146,8 @@ $(document).ready(function() {
                         price: parseFloat(p.price).toFixed(2),
                         stock: p.stock,
                         status: p.status,
-                        actions: '<button class="edit-btn" data-id="' + p.id + '">Edit</button> <button class="delete-btn" data-id="' + p.id + '">Delete</button>'
+                        deletedAt: p.deleted_at || null,
+                        actions: renderProductActions(p)
                     };
                 });
                 if (productsTable) { productsTable.destroy(); }
@@ -60,8 +155,12 @@ $(document).ready(function() {
                     data: products,
                     destroy: true,
                     columns: [
+                        { data: null, orderable: false, searchable: false, render: function(d, type, row) {
+                            const isDeleted = row.deletedAt ? true : false;
+                            return '<input type="checkbox" class="row-checkbox" data-id="' + row.id + '" data-deleted="' + isDeleted + '">';
+                        }},
                         { data: 'id' },
-                        { data: 'image', orderable: false, render: function(d) { return '<img src="' + d + '" width="50">'; } },
+                        { data: 'image', orderable: false, render: function(d) { return '<img src="' + d + '" width="40">'; } },
                         { data: 'name' },
                         { data: 'category' },
                         { data: 'price' },
@@ -81,7 +180,6 @@ $(document).ready(function() {
             method: 'GET',
             headers: { Authorization: 'Bearer ' + token },
             success: function(res) {
-                // API returns a plain array directly
                 const cats = Array.isArray(res) ? res : [];
                 let html = '<option value="">-- Select Category --</option>';
                 cats.forEach(function(c) {
@@ -205,9 +303,6 @@ $(document).ready(function() {
         }
     });
 
-    // Create / Update product — handled by jQuery Validate submitHandler
-
-    // Edit product
     $(document).on('click', '.edit-btn', function() {
         const id = $(this).data('id');
         $.ajax({
@@ -227,7 +322,6 @@ $(document).ready(function() {
                 $('#submit-btn').text('Update Product');
                 $('#cancel-edit-btn').show();
 
-                // Show existing images — Sequelize returns Product_Images
                 const container = $('#existing-images-container').empty();
                 if (p.Product_Images && p.Product_Images.length) {
                     p.Product_Images.forEach(function(img) {
@@ -247,7 +341,6 @@ $(document).ready(function() {
         });
     });
 
-    // Delete product
     $(document).on('click', '.delete-btn', function() {
         const id = $(this).data('id');
         PrettyPettyUI.confirm('Are you sure you want to delete this product?', function() {
@@ -263,22 +356,23 @@ $(document).ready(function() {
         });
     });
 
-    // Delete image
     $(document).on('click', '.delete-img-btn', function() {
         const imageId = $(this).data('image-id');
-        $.ajax({
-            url: API + '/api/products/images/' + imageId,
-            method: 'DELETE',
-            headers: { Authorization: 'Bearer ' + token },
-            success: function() {
-                $(this).closest('div').remove();
-                loadProducts();
-            }.bind(this),
-            error: function() { $('#form-error').text('Failed to delete image.'); }
+        const $btn = $(this);
+        PrettyPettyUI.confirm('Delete this image?', function() {
+            $.ajax({
+                url: API + '/api/products/images/' + imageId,
+                method: 'DELETE',
+                headers: { Authorization: 'Bearer ' + token },
+                success: function() {
+                    $btn.closest('div').remove();
+                    loadProducts();
+                },
+                error: function() { $('#form-error').text('Failed to delete image.'); }
+            });
         });
     });
 
-    // Cancel edit
     $('#cancel-edit-btn').on('click', function() {
         resetProductForm();
     });
