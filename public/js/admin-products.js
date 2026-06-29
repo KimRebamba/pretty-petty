@@ -142,7 +142,7 @@ $(document).ready(function() {
                         id: p.id,
                         image: img,
                         name: p.name,
-                        category: p.Category ? p.Category.name : (p.category_id || '-'),
+                        category: p.Category ? (p.Category.deleted_at ? p.Category.name + ' (soft-deleted)' : p.Category.name) : (p.category_id || '-'),
                         price: parseFloat(p.price).toFixed(2),
                         stock: p.stock,
                         status: p.status,
@@ -210,6 +210,12 @@ $(document).ready(function() {
     function submitProductForm(form) {
         $('#form-error').text('');
         $('#form-success').text('');
+
+        const categoryId = $('#prod-category').val();
+        if (!categoryId) {
+            $('#prod-category-error').text('Please select a category.');
+            return;
+        }
 
         const prodId = $('#prod-id').val();
         const formData = new FormData(form);

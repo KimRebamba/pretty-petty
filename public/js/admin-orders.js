@@ -180,8 +180,9 @@ $(document).ready(function() {
             headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
             data: JSON.stringify({ status: status }),
             success: function() {
-                PrettyPettyUI.flashMessage('#update-success', 'Order status updated! Email notification sent.');
-                $('.view-order-btn[data-order-id="' + orderId + '"]').trigger('click');
+                const $el = $('#update-success');
+                $el.text('Order status updated!').css({ color: '#15803d', padding: '8px 0' });
+                setTimeout(function () { $el.text(''); }, 5000);
                 loadOrders();
             },
             error: function(xhr) {

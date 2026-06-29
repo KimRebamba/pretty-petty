@@ -147,9 +147,9 @@ $(document).ready(function () {
     });
 
     // ── Load featured products ──
-    $.get(API + '/api/products', function (products) {
+    $.get(API + '/api/products/top-selling', function (products) {
         const $c = $('#products-container').empty();
-        const featured = products.slice(0, 9);
+        const featured = (Array.isArray(products) ? products : []).slice(0, 9);
 
         featured.forEach(function (product, i) {
             const images = product.Product_Images || [];

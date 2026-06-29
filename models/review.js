@@ -18,6 +18,11 @@ const Review = sequelize.define("Review", {
         allowNull: false
     },
 
+    order_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+
     rating: {
         type: DataTypes.TINYINT,
         allowNull: false,
@@ -48,7 +53,7 @@ const Review = sequelize.define("Review", {
     indexes: [
         {
             unique: true,
-            fields: ['user_id', 'product_id'] 
+            fields: ['user_id', 'product_id', 'order_id']
         }
     ]
 });

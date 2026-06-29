@@ -1,6 +1,7 @@
-const { Product, Category, Product_Image, Review, User } = require('../models/associations');
+const { Product, Category, Product_Image, Review, User, Order, Order_Item } = require('../models/associations');
 const path = require('path');
 const fs = require('fs');
+const { fn, col, literal, Op } = require('sequelize');
 const { findRecord } = require('../utils/findRecord');
 
 function normalizeImagePath(filePath) {
@@ -21,7 +22,7 @@ const index = async (req, res) => {
         const products = await Product.findAll({
             where,
             include: [
-                { model: Category },
+                { model: Category, paranoid: false },
                 {
                     model: Product_Image,
                     required: false
@@ -39,11 +40,76 @@ const index = async (req, res) => {
     }
 };
 
+const topSelling = async (req, res) => {
+    try {
+        // Get product IDs with most completed order quantities
+        const topRows = await Order_Item.findAll({
+            attributes: [
+                'product_id',
+                [fn('SUM', col('quantity')), 'total_sold']
+            ],
+            include: [
+                {
+                    model: Order,
+                    attributes: [],
+                    where: { status: 'Completed' },
+                    required: true
+                }
+            ],
+            group: ['product_id'],
+            order: [[fn('SUM', col('quantity')), 'DESC']],
+            limit: 3,
+            raw: true
+        });
+
+        const topIds = topRows.map(r => r.product_id);
+        let products = [];
+
+        if (topIds.length > 0) {
+            const topProducts = await Product.findAll({
+                where: { id: topIds },
+                include: [
+                    { model: Category, paranoid: false },
+                    { model: Product_Image },
+                    { model: Review, include: [{ model: User, attributes: ['id', 'first_name', 'last_name'] }] }
+                ]
+            });
+            // Preserve order by total_sold
+            const byId = {};
+            topProducts.forEach(p => { byId[p.id] = p; });
+            products = topIds.map(id => byId[id]).filter(Boolean);
+        }
+
+        // Fill to 3 with newest if needed
+        if (products.length < 3) {
+            const existingIds = products.map(p => p.id);
+            const fillers = await Product.findAll({
+                where: existingIds.length > 0 ? { id: { [Op.notIn]: existingIds } } : {},
+                include: [
+                    { model: Category, paranoid: false },
+                    { model: Product_Image },
+                    { model: Review, include: [{ model: User, attributes: ['id', 'first_name', 'last_name'] }] }
+                ],
+                order: [['created_at', 'DESC']],
+                limit: 3 - products.length
+            });
+            products = products.concat(fillers.map(f => f.get({ plain: true })));
+        } else {
+            products = products.map(p => p.get({ plain: true }));
+        }
+
+        return res.json(products);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 const show = async (req, res) => {
     try {
         const product = await Product.findByPk(req.params.id, {
             include: [
-                { model: Category },
+                { model: Category, paranoid: false },
                 { model: Product_Image },
                 { model: Review, include: [{ model: User, attributes: ['id', 'first_name', 'last_name'] }] }
             ]
@@ -207,6 +273,7 @@ const bulkDelete = async (req, res) => {
 
 module.exports = {
     index,
+    topSelling,
     show,
     store,
     update,

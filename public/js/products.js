@@ -4,7 +4,6 @@ $(document).ready(function () {
     const isLoggedIn = !!token;
 
     PrettyPettyUI.apiBase = API;
-    PrettyPettyUI.initButtons('button');
     PrettyPettyUI.initProductSearchAutocomplete();
 
     // ── Alert banner ──
@@ -184,7 +183,6 @@ $(document).ready(function () {
             $controls.append(btn);
         }
         $controls.append($('<button class="page-btn"></button>').text('Next').data('page', currentPage + 1).prop('disabled', currentPage === totalPages));
-        PrettyPettyUI.initButtons('.page-btn');
     }
 
     $(document).on('click', '.page-btn', function () {
@@ -252,7 +250,7 @@ $(document).ready(function () {
     });
 
     // ── Category filter ──
-    $('#category-filter').on('change', function () {
+    $('#category-filter').selectmenu({ change: function() {
         const catId = $(this).val();
         fetchProducts(catId || '', function () {
             if (infiniteScrollEnabled) {
@@ -264,85 +262,60 @@ $(document).ready(function () {
                 renderCurrentPage();
             }
         });
-    });
+    }});
 
     // ── Helper: build product card ──
     function buildProductCard(product) {
         const images = product.Product_Images || [];
         const imgSrc = images.length > 0 ? images[0].image_path : '/uploads/placeholder.jpg';
+        const catName = product.Category ? product.Category.name : '';
         const outOfStock = !product.stock || product.stock <= 0;
 
-        const card = $('<div class="product-card"></div>').css({
-            display: 'inline-block', width: '220px', margin: '10px',
-            verticalAlign: 'top', border: '1px solid #ddd', borderRadius: '8px', padding: '10px', textAlign: 'center'
-        });
+        const card = $('<div class="product-item"></div>');
 
-        if (outOfStock) {
-            // No link on image for out-of-stock
-            card.append($('<img>').attr({ src: imgSrc, alt: product.name }).css({ width: '200px', height: '180px', objectFit: 'cover' }));
-            card.append($('<span></span>').text('Out of Stock').css({
-                display: 'inline-block', backgroundColor: '#e74c3c', color: '#fff',
-                padding: '4px 10px', borderRadius: '4px', fontSize: '12px', fontWeight: 'bold', marginTop: '6px'
-            }));
-        } else {
-            card.append($('<a></a>', { href: 'product_details.html?id=' + product.id }).append(
-                $('<img>').attr({ src: imgSrc, alt: product.name }).css({ width: '200px', height: '180px', objectFit: 'cover' })
-            ));
+        const imgWrap = $(
+            '<div class="product-img-wrap">' +
+                '<img src="' + imgSrc + '" alt="' + product.name + '">' +
+                (outOfStock ? '<span class="out-of-stock-label">Out of Stock</span>' : '') +
+            '</div>'
+        );
+
+        const info = $(
+            '<div class="product-info">' +
+                '<p class="product-cat-label">' + catName + '</p>' +
+                '<h3>' + product.name + '</h3>' +
+                '<p class="product-price">$' + parseFloat(product.price).toFixed(2) + '</p>' +
+            '</div>'
+        );
+
+        card.append(imgWrap).append(info);
+
+        if (isLoggedIn && !outOfStock) {
+            const addBtn = $(
+                '<button class="add-btn-float" data-product-id="' + product.id + '">' +
+                    '<span class="iconify" data-icon="lucide:plus" style="font-size:13px;"></span>' +
+                '</button>'
+            );
+            imgWrap.append(addBtn);
         }
 
-        card.append($('<h3></h3>').text(product.name));
-        card.append($('<p></p>').text('$' + parseFloat(product.price).toFixed(2)));
-
-        // Average rating
-        if (product.Reviews && product.Reviews.length > 0) {
-            var avgRating = product.Reviews.reduce(function(sum, r) { return sum + r.rating; }, 0) / product.Reviews.length;
-            var starsHtml = '';
-            for (var s = 1; s <= 5; s++) {
-                starsHtml += s <= Math.round(avgRating) ? '\u2605' : '\u2606';
-            }
-            card.append($('<p></p>').html('<span style="color: #f59e0b;">' + starsHtml + '</span> <small>(' + product.Reviews.length + ' reviews)</small>'));
-        }
-
-        if (isLoggedIn) {
-            if (outOfStock) {
-                card.append($('<button class="add-to-cart-btn"></button>').text('Add to Cart')
-                    .data('product-id', product.id)
-                    .prop('disabled', true)
-                    .css({ marginTop: '8px', padding: '6px 12px', cursor: 'not-allowed', opacity: 0.5 })
-                );
-            } else {
-                card.append($('<button class="add-to-cart-btn"></button>').text('Add to Cart')
-                    .data('product-id', product.id)
-                    .css({ marginTop: '8px', padding: '6px 12px', cursor: 'pointer' })
-                );
-            }
-        }
-
-        // Wrap entire card in <a> for in-stock products
-        if (!outOfStock) {
-            const link = $('<a></a>', {
-                href: 'product_details.html?id=' + product.id,
-                css: { textDecoration: 'none', color: 'inherit' }
-            });
-            card.wrap(link);
-        }
-
-        return card;
+        const link = $('<a href="product_details.html?id=' + product.id + '"></a>').append(card);
+        return link;
     }
 
     // ── Add to Cart (delegated) ──
-    $(document).on('click', '.add-to-cart-btn', function (e) {
+    $(document).on('click', '.add-btn-float', function (e) {
         e.preventDefault();
         e.stopPropagation();
         if (!localStorage.getItem('token')) { window.location.href = '/login.html'; return; }
-        const pid = $(this).data('product-id');
+        const pid = $(this).attr('data-product-id');
         $.ajax({
             url: API + '/api/cart',
             method: 'POST',
             contentType: 'application/json',
             headers: { Authorization: 'Bearer ' + localStorage.getItem('token') },
             data: JSON.stringify({ product_id: pid, quantity: 1 }),
-            success: function () { alert('Added to cart!'); loadCartCount(); },
+            success: function () { loadCartCount(); },
             error: function (xhr) { alert((xhr.responseJSON && xhr.responseJSON.message) || 'Failed to add to cart.'); }
         });
     });

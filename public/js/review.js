@@ -6,6 +6,7 @@ $(document).ready(function () {
     var urlParams = new URLSearchParams(window.location.search);
     var reviewId = urlParams.get('id');
     var productId = urlParams.get('product_id');
+    var orderId = urlParams.get('order_id');
     var isEditMode = !!reviewId;
 
     if (!token || !user.id) {
@@ -111,6 +112,7 @@ $(document).ready(function () {
                 $('#rating').val(String(review.rating));
                 $('#comment').val(review.comment || '');
                 $('#review-product-name').text(review.Product ? review.Product.name : 'Product');
+                try { $('#rating').selectmenu('refresh'); } catch(e) {}
                 showForm();
             },
             error: function (xhr) {
@@ -124,6 +126,7 @@ $(document).ready(function () {
             method: 'GET',
             success: function (product) {
                 $('#product-id').val(product.id);
+                $('#order-id').val(orderId);
                 $('#review-product-name').text(product.name);
                 showForm();
             },
@@ -165,6 +168,7 @@ $(document).ready(function () {
             };
         } else {
             payload.product_id = parseInt($('#product-id').val(), 10);
+            payload.order_id = parseInt($('#order-id').val(), 10);
             ajaxOptions = {
                 url: API + '/api/reviews',
                 method: 'POST',

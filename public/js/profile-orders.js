@@ -84,7 +84,7 @@ $(document).ready(function () {
             headers: { Authorization: 'Bearer ' + token },
             success: function (reviews) {
                 reviews.forEach(function (r) {
-                    reviewedProducts[r.product_id] = r;
+                    reviewedProducts[r.product_id + '_' + r.order_id] = r;
                 });
                 if (callback) callback();
             },
@@ -138,13 +138,14 @@ $(document).ready(function () {
                     var reviewAction = '';
 
                     if (order.status === 'Completed') {
-                        if (reviewedProducts[item.product_id]) {
-                            var r = reviewedProducts[item.product_id];
+                        const reviewKey = item.product_id + '_' + order.id;
+                        if (reviewedProducts[reviewKey]) {
+                            var r = reviewedProducts[reviewKey];
                             var stars = '';
                             for (var s = 1; s <= 5; s++) stars += s <= r.rating ? '★' : '☆';
                             reviewAction = '<br><span style="color: green; font-size: 12px;">✓ Reviewed ' + stars + '</span>';
                         } else {
-                            reviewAction = '<br><a href="review.html?product_id=' + item.product_id + '" style="font-size: 12px;">Write Review</a>';
+                            reviewAction = '<br><a href="review.html?product_id=' + item.product_id + '&order_id=' + order.id + '" style="font-size: 12px;">Write Review</a>';
                         }
                     }
 

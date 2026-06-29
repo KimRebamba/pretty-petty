@@ -29,6 +29,9 @@ Order.belongsTo(User, { foreignKey: 'user_id' });
 Order.hasMany(Order_Item, { foreignKey: 'order_id', onDelete: 'CASCADE' });
 Order_Item.belongsTo(Order, { foreignKey: 'order_id' });
 
+Order.hasMany(Review, { foreignKey: 'order_id', onDelete: 'CASCADE' });
+Review.belongsTo(Order, { foreignKey: 'order_id', onDelete: 'CASCADE' });
+
 Product.hasMany(Order_Item, { foreignKey: 'product_id' });
 Order_Item.belongsTo(Product, { foreignKey: 'product_id' });
 

@@ -79,9 +79,9 @@ $(document).ready(function() {
                         actions = '<button class="restore-btn" data-id="' + r.id + '">Restore</button>';
                     } else {
                         actions = '<button class="view-btn" data-id="' + r.id + '">View</button>';
-                        if (!verified) {
-                            actions += ' <button class="verify-btn" data-id="' + r.id + '">Verify</button>';
-                        }
+                        // if (!verified) {
+                        //     actions += ' <button class="verify-btn" data-id="' + r.id + '">Verify</button>';
+                        // }
                     }
                     return {
                         DT_RowId: 'row_' + r.id,

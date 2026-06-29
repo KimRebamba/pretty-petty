@@ -98,7 +98,7 @@ $(document).ready(function () {
 
         $('#p-main-img').attr('src', imgSrc);
         $('#p-name').text(product.name);
-        $('#p-category').text(product.Category ? product.Category.name : '');
+        $('#p-category').text(product.Category ? (product.Category.deleted_at ? product.Category.name + ' (deleted)' : product.Category.name) : '');
         $('#p-price').text('$' + parseFloat(product.price).toFixed(2));
         $('#p-stock').text('Stock: ' + product.stock);
         $('#p-description').text(product.description || '');

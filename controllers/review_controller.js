@@ -66,13 +66,13 @@ const show = async (req, res) => {
     }
 };
 
-async function userHasCompletedPurchase(user_id, product_id) {
+async function userHasCompletedPurchase(user_id, product_id, order_id) {
     const purchased = await Order_Item.findOne({
         where: { product_id },
         include: [
             {
                 model: Order,
-                where: { user_id, status: 'Completed' },
+                where: { id: order_id, user_id, status: 'Completed' },
                 required: true
             }
         ]
@@ -82,11 +82,19 @@ async function userHasCompletedPurchase(user_id, product_id) {
 
 const store = async (req, res) => {
     try {
-        const { product_id, rating, comment } = req.body;
+        const { product_id, rating, comment, order_id } = req.body;
         const user_id = req.user.id;
 
-        if (!product_id || !rating) {
-            return res.status(400).json({ message: 'Product ID and rating are required' });
+        if (!product_id || !rating || !order_id) {
+            return res.status(400).json({ message: 'Product ID, order ID, and rating are required' });
+        }
+
+        if (comment) {
+            const profanityPattern = /\b(shit|fuck|damn|ass|bitch|bastard|crap|dick|piss|hell)\b/gi;
+            const hasProfanity = profanityPattern.test(comment);
+            if (hasProfanity) {
+                return res.status(400).json({ message: 'Review contains inappropriate language. Please remove any profanity and try again.' });
+            }
         }
 
         const product = await Product.findByPk(product_id);
@@ -98,13 +106,13 @@ const store = async (req, res) => {
             return res.status(400).json({ message: 'Rating must be between 1 and 5' });
         }
 
-        const hasPurchased = await userHasCompletedPurchase(user_id, product_id);
+        const hasPurchased = await userHasCompletedPurchase(user_id, product_id, order_id);
         if (!hasPurchased) {
             return res.status(403).json({ message: 'You can only review products from completed orders' });
         }
 
         const existingReview = await Review.findOne({
-            where: { user_id, product_id }
+            where: { user_id, product_id, order_id }
         });
 
         if (existingReview) {
@@ -114,6 +122,7 @@ const store = async (req, res) => {
         const review = await Review.create({
             user_id,
             product_id,
+            order_id: parseInt(order_id, 10),
             rating: parseInt(rating, 10),
             comment: comment || ''
         });
@@ -165,6 +174,10 @@ const update = async (req, res) => {
         }
 
         if (comment !== undefined) {
+            const profanityPattern = /\b(shit|fuck|damn|ass|bitch|bastard|crap|dick|piss|hell)\b/gi;
+            if (profanityPattern.test(comment)) {
+                return res.status(400).json({ message: 'Review contains inappropriate language.' });
+            }
             review.comment = comment;
         }
 

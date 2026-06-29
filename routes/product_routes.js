@@ -5,6 +5,7 @@ const Product_Controller = require('../controllers/product_controller');
 const upload = require('../middlewares/upload');
 const { authenticate, isAdmin } = require('../middlewares/Authentication');
 
+router.get('/top-selling', Product_Controller.topSelling);
 router.get('/', Product_Controller.index);
 router.post('/', authenticate, isAdmin, upload.array('images', 10), Product_Controller.store);
 router.delete('/bulk', authenticate, isAdmin, Product_Controller.bulkDelete);
